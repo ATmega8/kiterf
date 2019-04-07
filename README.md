@@ -4,9 +4,9 @@
 [![Release](https://img.shields.io/github/release/ATmega8/kiterf.svg "release badge")](https://github.com/ATmega8/kiterf/releases/latest/ "release")
 [![Release](https://img.shields.io/github/issues/ATmega8/kiterf.svg "issues badge")](https://github.com/ATmega8/kiterf/issues "issues")
 
-_KieRF is an SDR system with k210 as its core controller, which makes SDR more intelligent, portable and cheap._
+_KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which makes SDR more intelligent, portable and cheap._
 
-* KiteRF structure
+* KiteRF Structure
 
   ![KiteRF](data/kiterf_structure.svg)
 
@@ -54,7 +54,7 @@ _KieRF is an SDR system with k210 as its core controller, which makes SDR more i
 
       * Mixing IF signal to baseband and outputting IQ analog signal
 
-    * VCO (Voltage-controlled oscillator)
+    * VCO (Voltage-Controlled oscillator)
 
       * Provide local IF frequency
 
@@ -62,7 +62,7 @@ _KieRF is an SDR system with k210 as its core controller, which makes SDR more i
 
       * Mixing HF signal to IF signal
 
-    * LNA (Low-noise Amplifier)
+    * LNA (Low-Noise Amplifier)
 
       * Suppression of Mirror Noise Signal
 
@@ -131,7 +131,7 @@ _KieRF is an SDR system with k210 as its core controller, which makes SDR more i
 
     * release
 
-      * pcb gerber
+      * PCB gerber
 
       * FPGA bin
 
