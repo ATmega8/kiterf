@@ -6,7 +6,7 @@ _Kierf is an SDR system with k210 as its core controller, which makes SDR more i
 
 * Kiterf coreborad v1.0.0
 
-  ![Kiterf](https://github.com/ATmega8/kiterf/data/kiterf_1.0.0.jpg)
+  ![Kiterf](data/kiterf_1.0.0.jpg)
 
 ## Contents
 
@@ -51,7 +51,7 @@ _Kierf is an SDR system with k210 as its core controller, which makes SDR more i
     ```
 ## License
 
-[![License](https://img.shields.io/github/license/ATmega8/kiterf.svg)](https://github.com/ATmega8/kiterf/LICENSE)
+[![License](https://img.shields.io/github/license/ATmega8/kiterf.svg)](LICENSE)
 
 * MIT License
  
