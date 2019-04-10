@@ -1,0 +1,311 @@
+EESchema Schematic File Version 4
+LIBS:MSI001-cache
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 5
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:Conn_01x02_Female J?
+U 1 1 5CFF009F
+P 1045 1885
+F 0 "J?" H 937 1560 50  0000 C CNN
+F 1 "+5V" H 937 1651 50  0000 C CNN
+F 2 "" H 1045 1885 50  0001 C CNN
+F 3 "~" H 1045 1885 50  0001 C CNN
+	1    1045 1885
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1245 1785 1420 1785
+Wire Wire Line
+	1420 1785 1420 1590
+Wire Wire Line
+	1420 1590 1620 1590
+$Comp
+L Device:Ferrite_Bead FB?
+U 1 1 5CFF0831
+P 1940 1590
+F 0 "FB?" V 1666 1590 50  0000 C CNN
+F 1 "Ferrite_Bead" V 1757 1590 50  0000 C CNN
+F 2 "" V 1870 1590 50  0001 C CNN
+F 3 "~" H 1940 1590 50  0001 C CNN
+	1    1940 1590
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2090 1590 2535 1590
+$Comp
+L Regulator_Linear:LP5907MFX-2.8 U?
+U 1 1 5CFF18A3
+P 3565 1690
+F 0 "U?" H 3565 2057 50  0000 C CNN
+F 1 "LP5907MFX-3.3" H 3565 1966 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23-5" H 3565 2040 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/lp5907.pdf" H 3565 2190 50  0001 C CNN
+	1    3565 1690
+	1    0    0    -1  
+$EndComp
+Text HLabel 3210 1690 0    50   Input ~ 0
+POWER_EN
+Wire Wire Line
+	3210 1690 3265 1690
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF25FF
+P 3565 2060
+F 0 "#PWR?" H 3565 1810 50  0001 C CNN
+F 1 "GND" H 3570 1887 50  0000 C CNN
+F 2 "" H 3565 2060 50  0001 C CNN
+F 3 "" H 3565 2060 50  0001 C CNN
+	1    3565 2060
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3565 2060 3565 1990
+$Comp
+L Device:C C?
+U 1 1 5CFF3EC5
+P 2535 1825
+F 0 "C?" H 2650 1871 50  0000 L CNN
+F 1 "10uF" H 2650 1780 50  0000 L CNN
+F 2 "" H 2573 1675 50  0001 C CNN
+F 3 "~" H 2535 1825 50  0001 C CNN
+	1    2535 1825
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2535 1675 2535 1590
+Connection ~ 2535 1590
+Wire Wire Line
+	2535 1590 3265 1590
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF4533
+P 2535 2070
+F 0 "#PWR?" H 2535 1820 50  0001 C CNN
+F 1 "GND" H 2540 1897 50  0000 C CNN
+F 2 "" H 2535 2070 50  0001 C CNN
+F 3 "" H 2535 2070 50  0001 C CNN
+	1    2535 2070
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2535 2070 2535 1975
+Wire Wire Line
+	3865 1590 4285 1590
+Wire Wire Line
+	4285 1590 4285 1325
+$Comp
+L power:VCC #PWR?
+U 1 1 5CFF5041
+P 4285 1325
+F 0 "#PWR?" H 4285 1175 50  0001 C CNN
+F 1 "VCC" H 4302 1498 50  0000 C CNN
+F 2 "" H 4285 1325 50  0001 C CNN
+F 3 "" H 4285 1325 50  0001 C CNN
+	1    4285 1325
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5CFF5198
+P 4285 1830
+F 0 "C?" H 4400 1876 50  0000 L CNN
+F 1 "1uF" H 4400 1785 50  0000 L CNN
+F 2 "" H 4323 1680 50  0001 C CNN
+F 3 "~" H 4285 1830 50  0001 C CNN
+	1    4285 1830
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4285 1680 4285 1590
+Connection ~ 4285 1590
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF56C3
+P 4285 2060
+F 0 "#PWR?" H 4285 1810 50  0001 C CNN
+F 1 "GND" H 4290 1887 50  0000 C CNN
+F 2 "" H 4285 2060 50  0001 C CNN
+F 3 "" H 4285 2060 50  0001 C CNN
+	1    4285 2060
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4285 2060 4285 1980
+Wire Wire Line
+	1245 1885 1425 1885
+Wire Wire Line
+	1425 1885 1425 2055
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF6ABF
+P 1425 2055
+F 0 "#PWR?" H 1425 1805 50  0001 C CNN
+F 1 "GND" H 1430 1882 50  0000 C CNN
+F 2 "" H 1425 2055 50  0001 C CNN
+F 3 "" H 1425 2055 50  0001 C CNN
+	1    1425 2055
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Ferrite_Bead FB?
+U 1 1 5CFF9DE6
+P 1925 2880
+F 0 "FB?" V 1651 2880 50  0000 C CNN
+F 1 "Ferrite_Bead" V 1742 2880 50  0000 C CNN
+F 2 "" V 1855 2880 50  0001 C CNN
+F 3 "~" H 1925 2880 50  0001 C CNN
+	1    1925 2880
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2075 2880 2520 2880
+$Comp
+L Regulator_Linear:LP5907MFX-2.8 U?
+U 1 1 5CFF9DED
+P 3550 2980
+F 0 "U?" H 3550 3347 50  0000 C CNN
+F 1 "LP5907MFX-3.3" H 3550 3256 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23-5" H 3550 3330 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/lp5907.pdf" H 3550 3480 50  0001 C CNN
+	1    3550 2980
+	1    0    0    -1  
+$EndComp
+Text HLabel 3195 2980 0    50   Input ~ 0
+POWER_EN
+Wire Wire Line
+	3195 2980 3250 2980
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF9DF5
+P 3550 3350
+F 0 "#PWR?" H 3550 3100 50  0001 C CNN
+F 1 "GND" H 3555 3177 50  0000 C CNN
+F 2 "" H 3550 3350 50  0001 C CNN
+F 3 "" H 3550 3350 50  0001 C CNN
+	1    3550 3350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3550 3350 3550 3280
+$Comp
+L Device:C C?
+U 1 1 5CFF9DFC
+P 2520 3115
+F 0 "C?" H 2635 3161 50  0000 L CNN
+F 1 "10uF" H 2635 3070 50  0000 L CNN
+F 2 "" H 2558 2965 50  0001 C CNN
+F 3 "~" H 2520 3115 50  0001 C CNN
+	1    2520 3115
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2520 2965 2520 2880
+Connection ~ 2520 2880
+Wire Wire Line
+	2520 2880 3250 2880
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF9E05
+P 2520 3360
+F 0 "#PWR?" H 2520 3110 50  0001 C CNN
+F 1 "GND" H 2525 3187 50  0000 C CNN
+F 2 "" H 2520 3360 50  0001 C CNN
+F 3 "" H 2520 3360 50  0001 C CNN
+	1    2520 3360
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2520 3360 2520 3265
+Wire Wire Line
+	3850 2880 4270 2880
+Wire Wire Line
+	4270 2880 4270 2680
+$Comp
+L Device:C C?
+U 1 1 5CFF9E14
+P 4270 3120
+F 0 "C?" H 4385 3166 50  0000 L CNN
+F 1 "1uF" H 4385 3075 50  0000 L CNN
+F 2 "" H 4308 2970 50  0001 C CNN
+F 3 "~" H 4270 3120 50  0001 C CNN
+	1    4270 3120
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4270 2970 4270 2880
+Connection ~ 4270 2880
+$Comp
+L power:GND #PWR?
+U 1 1 5CFF9E1C
+P 4270 3350
+F 0 "#PWR?" H 4270 3100 50  0001 C CNN
+F 1 "GND" H 4275 3177 50  0000 C CNN
+F 2 "" H 4270 3350 50  0001 C CNN
+F 3 "" H 4270 3350 50  0001 C CNN
+	1    4270 3350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4270 3350 4270 3270
+Wire Wire Line
+	1775 2880 1620 2880
+Wire Wire Line
+	1620 2880 1620 1590
+Connection ~ 1620 1590
+Wire Wire Line
+	1620 1590 1790 1590
+$Comp
+L power:VDD #PWR?
+U 1 1 5CFFA969
+P 4270 2615
+F 0 "#PWR?" H 4270 2465 50  0001 C CNN
+F 1 "VDD" H 4287 2788 50  0000 C CNN
+F 2 "" H 4270 2615 50  0001 C CNN
+F 3 "" H 4270 2615 50  0001 C CNN
+	1    4270 2615
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VBUS #PWR?
+U 1 1 5CFFB48F
+P 4700 2605
+F 0 "#PWR?" H 4700 2455 50  0001 C CNN
+F 1 "VBUS" H 4715 2778 50  0000 C CNN
+F 2 "" H 4700 2605 50  0001 C CNN
+F 3 "" H 4700 2605 50  0001 C CNN
+	1    4700 2605
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5CFFCC16
+P 4500 2680
+F 0 "R?" V 4293 2680 50  0000 C CNN
+F 1 "0R" V 4384 2680 50  0000 C CNN
+F 2 "" V 4430 2680 50  0001 C CNN
+F 3 "~" H 4500 2680 50  0001 C CNN
+	1    4500 2680
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4700 2605 4700 2680
+Wire Wire Line
+	4700 2680 4650 2680
+Wire Wire Line
+	4350 2680 4270 2680
+Connection ~ 4270 2680
+Wire Wire Line
+	4270 2680 4270 2615
+$EndSCHEMATC

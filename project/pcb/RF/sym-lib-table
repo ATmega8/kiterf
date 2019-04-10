@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name PE42641)(type Legacy)(uri ${KIPRJMOD}/PE42641.lib)(options "")(descr ""))
   (lib (name MGA68563)(type Legacy)(uri ${KIPRJMOD}/MGA68563.lib)(options "")(descr ""))
+  (lib (name SKY13251)(type Legacy)(uri ${KIPRJMOD}/SKY13251.lib)(options "")(descr ""))
 )
