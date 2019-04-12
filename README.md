@@ -125,7 +125,7 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
       * FPGA project (ISE)
 
-      * esp-32 project (esp-idf)
+      * ESP32 project (esp-idf)
 
       * K210 project (Kendryte FreeRTOS)
 
@@ -146,6 +146,43 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
       * sdk
 
       * toolchain
+
+## How to use
+
+* clone
+
+  ```bash
+  git clone --init --recursive https://github.com/ATmega8/kiterf
+  cd kiterf
+  ```
+
+  * note
+
+    Don't forget `--init --recursive`, because we use submodule.
+
+* update
+
+  ```bash
+  git pull
+  git submodule update --init --recursive
+  ```
+
+* Install toolchain
+
+  ```bash
+  wget https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+  tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/k210/
+  rm kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+  ```
+
+* Add environment variables
+
+  ```bash
+  . add_path.sh
+  ```
+  * note
+
+    Don't forget `"."`
 
 ## License
 
