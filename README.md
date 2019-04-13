@@ -81,42 +81,27 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 * Directory tree
 
     ```
+    ├── add_path.sh
     ├── data
     │   ├── kiterf_1.0.0.jpg
     │   ├── kiterf_structure.pos
     │   └── kiterf_structure.svg
     ├── docs
+    │   ├── kendryte_datasheet.pdf
+    │   └── kendryte_freertos_programming_guide.pdf
     ├── LICENSE
     ├── project
+    │   ├── code
+    │   │   └── k210
     │   └── pcb
-    │       ├── ESP32_K210.bak
-    │       ├── ESP32_K210-cache.lib
-    │       ├── ESP32_K210.csv
-    │       ├── ESP32_K210.kicad_pcb
-    │       ├── ESP32_K210.kicad_pcb-bak
-    │       ├── ESP32_K210.net
-    │       ├── ESP32_K210.png
-    │       ├── ESP32_K210.pro
-    │       ├── ESP32_K210-rescue.dcm
-    │       ├── ESP32_K210-rescue.lib
-    │       ├── ESP32_K210.sch
-    │       ├── ESP32_K210.xlsx
-    │       ├── ESP32_K210.xml
-    │       ├── FPC.pretty
-    │       ├── fp-info-cache
-    │       ├── K210.bak
-    │       ├── K210_Gerber
-    │       ├── k210.pretty
-    │       ├── K210.sch
-    │       ├── lib
-    │       ├── POWER.bak
-    │       ├── POWER.sch
-    │       ├── sym-lib-table
-    │       ├── USB2UART.bak
-    │       └── USB2UART.sch
+    │       ├── K210
+    │       └── RF
     ├── README.md
-    ├── release
     └── tools
+        └── k210
+            ├── kendryte-freertos-sdk
+            ├── kendryte-toolchain
+            └── kflash
     ```
 
     * project
@@ -152,13 +137,13 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 * clone
 
   ```bash
-  git clone --init --recursive https://github.com/ATmega8/kiterf
+  git clone --recursive https://github.com/ATmega8/kiterf
   cd kiterf
   ```
 
   * note
 
-    Don't forget `--init --recursive`, because we use submodule.
+    Don't forget `--recursive`, because we use submodule.
 
 * update
 
