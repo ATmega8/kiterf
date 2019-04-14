@@ -1,17 +1,3 @@
-/* Copyright 2018 Canaan Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -74,17 +60,7 @@ uint16_t get_bit1_num(uint32_t data)
     return num;
 }
 
-void test_task(void *arg)
-{
-    uint32_t cnt = 0;
-    while (1) {
-        printf("hello kiterf! Count: %d\n", cnt++);
-        vTaskDelay(500 / portTICK_RATE_MS);
-    }
-    vTaskDelete(NULL);
-}
-
-int main()
+void fft_task()
 {
     int32_t i;
     float tempf1[3];
@@ -210,8 +186,28 @@ int main()
             (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_sec -get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_sec) * 1000*1000 +
             (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_usec - get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_usec));
 
-    xTaskCreate(test_task, "test_task", 1024, NULL, 5, NULL);
+    while (1) {
+        vTaskDelay(10 / portTICK_RATE_MS);
+    }
+    vTaskDelete(NULL);
+}
 
-    while (1);
+void test_task(void *arg)
+{
+    uint32_t cnt = 0;
+    while (1) {
+        printf("hello kiterf! Count: %d\n", cnt++);
+        vTaskDelay(500 / portTICK_RATE_MS);
+    }
+    vTaskDelete(NULL);
+}
+
+int main()
+{
+    xTaskCreate(fft_task, "fft_task", 2560, NULL, 5, NULL);
+    xTaskCreate(test_task, "test_task", 512, NULL, 5, NULL);
+    while (1) {
+        vTaskDelay(10 / portTICK_RATE_MS);
+    }
     return 0;
 }

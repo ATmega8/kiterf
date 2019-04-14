@@ -32,3 +32,4 @@ docs/doxygen_sqlite3.db
 
 # Tool chain
 *kendryte-toolchain
+*xtensa-esp32-elf
