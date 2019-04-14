@@ -92,13 +92,18 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
     ├── LICENSE
     ├── project
     │   ├── code
-    │   │   └── k210
+    │   │   ├── ESP32
+    │   │   └── K210
     │   └── pcb
+    │       ├── ESP32
     │       ├── K210
     │       └── RF
     ├── README.md
     └── tools
-        └── k210
+        ├── ESP32
+        │   ├── esp-idf
+        │   └── xtensa-esp32-elf
+        └── K210
             ├── kendryte-freertos-sdk
             ├── kendryte-toolchain
             └── kflash
@@ -156,8 +161,11 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
   ```bash
   wget https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
-  tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/k210/
+  tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/K210/
   rm kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+  wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+  tar zxvf xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz -C tools/ESP32/
+  rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
   ```
 
 * Add environment variables

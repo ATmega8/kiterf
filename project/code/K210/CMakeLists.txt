@@ -9,7 +9,7 @@ project(${PROJ})
 include("${SDK}/cmake/common.cmake")
 
 ## Use SDK library API to add source files
-add_source_files("user/main.c"
+add_source_files("main/main.c"
 		 "components/fft_soft/fft_soft.c"
 		 )
 header_directories("components/fft_soft/include")

@@ -1,6 +1,9 @@
-[submodule "tools/k210/kendryte-freertos-sdk"]
-	path = tools/k210/kendryte-freertos-sdk
+[submodule "tools/ESP32/esp-idf"]
+	path = tools/ESP32/esp-idf
+	url = https://github.com/espressif/esp-idf.git
+[submodule "tools/K210/kendryte-freertos-sdk"]
+	path = tools/K210/kendryte-freertos-sdk
 	url = https://github.com/kendryte/kendryte-freertos-sdk.git
-[submodule "tools/k210/kflash"]
-	path = tools/k210/kflash
+[submodule "tools/K210/kflash"]
+	path = tools/K210/kflash
 	url = https://github.com/kendryte/kflash.py.git
