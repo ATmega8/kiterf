@@ -81,42 +81,27 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 * Directory tree
 
     ```
+    ├── add_path.sh
     ├── data
     │   ├── kiterf_1.0.0.jpg
     │   ├── kiterf_structure.pos
     │   └── kiterf_structure.svg
     ├── docs
+    │   ├── kendryte_datasheet.pdf
+    │   └── kendryte_freertos_programming_guide.pdf
     ├── LICENSE
     ├── project
+    │   ├── code
+    │   │   └── k210
     │   └── pcb
-    │       ├── ESP32_K210.bak
-    │       ├── ESP32_K210-cache.lib
-    │       ├── ESP32_K210.csv
-    │       ├── ESP32_K210.kicad_pcb
-    │       ├── ESP32_K210.kicad_pcb-bak
-    │       ├── ESP32_K210.net
-    │       ├── ESP32_K210.png
-    │       ├── ESP32_K210.pro
-    │       ├── ESP32_K210-rescue.dcm
-    │       ├── ESP32_K210-rescue.lib
-    │       ├── ESP32_K210.sch
-    │       ├── ESP32_K210.xlsx
-    │       ├── ESP32_K210.xml
-    │       ├── FPC.pretty
-    │       ├── fp-info-cache
-    │       ├── K210.bak
-    │       ├── K210_Gerber
-    │       ├── k210.pretty
-    │       ├── K210.sch
-    │       ├── lib
-    │       ├── POWER.bak
-    │       ├── POWER.sch
-    │       ├── sym-lib-table
-    │       ├── USB2UART.bak
-    │       └── USB2UART.sch
+    │       ├── K210
+    │       └── RF
     ├── README.md
-    ├── release
     └── tools
+        └── k210
+            ├── kendryte-freertos-sdk
+            ├── kendryte-toolchain
+            └── kflash
     ```
 
     * project
@@ -125,7 +110,7 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
       * FPGA project (ISE)
 
-      * esp-32 project (esp-idf)
+      * ESP32 project (esp-idf)
 
       * K210 project (Kendryte FreeRTOS)
 
@@ -146,6 +131,43 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
       * sdk
 
       * toolchain
+
+## How to use
+
+* clone
+
+  ```bash
+  git clone --recursive https://github.com/ATmega8/kiterf
+  cd kiterf
+  ```
+
+  * note
+
+    Don't forget `--recursive`, because we use submodule.
+
+* update
+
+  ```bash
+  git pull
+  git submodule update --init --recursive
+  ```
+
+* Install toolchain
+
+  ```bash
+  wget https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+  tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/k210/
+  rm kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+  ```
+
+* Add environment variables
+
+  ```bash
+  . add_path.sh
+  ```
+  * note
+
+    Don't forget `"."`
 
 ## License
 

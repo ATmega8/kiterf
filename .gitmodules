@@ -1,0 +1,6 @@
+[submodule "tools/k210/kendryte-freertos-sdk"]
+	path = tools/k210/kendryte-freertos-sdk
+	url = https://github.com/kendryte/kendryte-freertos-sdk.git
+[submodule "tools/k210/kflash"]
+	path = tools/k210/kflash
+	url = https://github.com/kendryte/kflash.py.git
