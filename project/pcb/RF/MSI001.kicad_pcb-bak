@@ -2,7 +2,7 @@
 
   (general
     (thickness 1.6)
-    (drawings 7)
+    (drawings 6)
     (tracks 1737)
     (zones 0)
     (modules 170)
@@ -66,8 +66,8 @@
     (grid_origin 102 70)
     (visible_elements FFFFFF7F)
     (pcbplotparams
-      (layerselection 0x010f0_ffffffff)
-      (usegerberextensions true)
+      (layerselection 0x010fc_ffffffff)
+      (usegerberextensions false)
       (usegerberattributes false)
       (usegerberadvancedattributes false)
       (creategerberjobfile false)
@@ -89,9 +89,9 @@
       (subtractmaskfromsilk false)
       (outputformat 1)
       (mirror false)
-      (drillshape 0)
+      (drillshape 1)
       (scaleselection 1)
-      (outputdirectory "RF_GERBER/"))
+      (outputdirectory ""))
   )
 
   (net 0 "")
@@ -7112,9 +7112,6 @@
       (net 113 "Net-(JP202-Pad2)"))
   )
 
-  (gr_text KiteRF (at 148.482 97.051) (layer F.SilkS)
-    (effects (font (size 5 5) (thickness 1)))
-  )
   (dimension 69 (width 0.15) (layer Margin)
     (gr_text "69.000 mm" (at 95.7 104.5 270) (layer Margin)
       (effects (font (size 1 1) (thickness 0.15)))
@@ -8882,7 +8879,7 @@
   (segment (start 164.865 124.61) (end 164.865 128.928) (width 0.4064) (layer B.Cu) (net 130))
   (segment (start 164.865 128.928) (end 174.39 128.928) (width 0.4064) (layer B.Cu) (net 130))
 
-  (zone (net 1) (net_name GND) (layer F.Cu) (tstamp 5CB7EE5B) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer F.Cu) (tstamp 0) (hatch edge 0.508)
     (connect_pads (clearance 0.508))
     (min_thickness 0.254)
     (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
@@ -10723,7 +10720,7 @@
       )
     )
   )
-  (zone (net 1) (net_name GND) (layer B.Cu) (tstamp 5CB7EE58) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer B.Cu) (tstamp 0) (hatch edge 0.508)
     (connect_pads (clearance 0.508))
     (min_thickness 0.254)
     (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))

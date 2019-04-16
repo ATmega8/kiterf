@@ -4,7 +4,7 @@ EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 5
+Sheet 5 5
 Title ""
 Date ""
 Rev ""
@@ -212,7 +212,7 @@ L Device:L L305
 U 1 1 5CAE553B
 P 6025 2420
 F 0 "L305" V 5940 2610 50  0000 C CNN
-F 1 "470nH" V 5940 2420 50  0000 C CNN
+F 1 "470nH" V 5935 2340 50  0000 C CNN
 F 2 "Inductor_SMD:L_0603_1608Metric" H 6025 2420 50  0001 C CNN
 F 3 "~" H 6025 2420 50  0001 C CNN
 	1    6025 2420
@@ -668,7 +668,7 @@ F 1 "74LVC1G08" H 3660 5125 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-23-5" H 3920 5290 50  0001 C CNN
 F 3 "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf" H 3920 5290 50  0001 C CNN
 	1    3920 5290
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 Wire Wire Line
 	3360 5290 3670 5290
@@ -1247,9 +1247,9 @@ Wire Wire Line
 	4220 5240 4630 5240
 Wire Wire Line
 	4220 5340 4630 5340
-Text Label 4630 5340 2    50   ~ 0
-SWITCH1_V1
 Text Label 4630 5240 2    50   ~ 0
+SWITCH1_V1
+Text Label 4630 5340 2    50   ~ 0
 SWITCH1_V2
 Wire Wire Line
 	6080 5130 6080 4845
