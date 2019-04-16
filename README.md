@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/release/ATmega8/kiterf.svg "release badge")](https://github.com/ATmega8/kiterf/releases/latest/ "release")
 [![Release](https://img.shields.io/github/issues/ATmega8/kiterf.svg "issues badge")](https://github.com/ATmega8/kiterf/issues "issues")
 
-_KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which makes SDR more intelligent, portable and cheap._
+_KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which make SDR more intelligent, portable and cheap._
 
 * KiteRF Structure
 
@@ -32,7 +32,7 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
     * ESP32 (Espressif ESP32)
 
-      * Wi-Fi Data Transfer
+      * Wi-Fi Data Transmission
 
       * SDCARD control
 
@@ -68,7 +68,7 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
     * RF Switch
 
-      * Switching signal paths at different frequencies
+      * Switching signal paths in different frequencies
 
 * KiteRF coreborad v1.0.0
 
@@ -148,7 +148,7 @@ _KiteRF is an SDR system with K210 & FPGA & ESP32 as its core controller, which 
 
   * note
 
-    Don't forget `--recursive`, because we use submodule.
+    Don't omit `--recursive`, because we use submodule.
 
 * update
 
