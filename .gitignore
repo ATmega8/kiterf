@@ -30,6 +30,12 @@ docs/doxygen_sqlite3.db
 # VS Code Settings
 .vscode/
 
+# Clion Settings
+*.idea/
+
+# Clion build directory
+*cmake-build-debug
+
 # Tool chain
 *kendryte-toolchain
 *xtensa-esp32-elf
