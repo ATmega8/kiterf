@@ -1,7 +1,10 @@
-#ifndef _FFT_SOFT_H
-#define _FFT_SOFT_H
+#pragma once
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SWAP(a, b) do {complex t = (a); (a) = (b); (b) = t;} while(0)
 
@@ -11,4 +14,6 @@ void fft_soft(complex *data, int n);
 void ifft_soft(complex *data, int n);
 void show(complex *data, int n);
 
-#endif /* _FFT_SOFT_H */
+#ifdef __cplusplus
+}
+#endif

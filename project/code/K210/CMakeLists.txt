@@ -10,9 +10,24 @@ include("${SDK}/cmake/common.cmake")
 
 ## Use SDK library API to add source files
 add_source_files("main/main.c"
-		 "components/fft_soft/fft_soft.c"
-		 )
+                 "components/fft_soft/fft_soft.c"
+                 "components/mmo/matrix_add.c" 
+                 "components/mmo/matrix_inv.c" 
+                 "components/mmo/matrix_mul.c" 
+                 "components/mmo/matrix_sub.c" 
+                 "components/mmo/matrix.c" 
+                 "components/mmo/test/matrix_add_test.c" 
+                 "components/mmo/test/matrix_inv_test.c" 
+                 "components/mmo/test/matrix_mul_test.c" 
+                 "components/mmo/test/matrix_sub_test.c" 
+                 "components/mmo/test/matrix_test.c" 
+                 "components/unity/unity.c")
+                 
+## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
+header_directories("components/mmo/include")
+header_directories("components/mmo/test")
+header_directories("components/unity/include")
 # other cmake instructions
 
 ## Use SDK builder to build this project

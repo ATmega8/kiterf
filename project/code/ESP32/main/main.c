@@ -6,7 +6,11 @@
 #include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "fft_soft.h"
+#include "matrix.h"
+#include "test.h"
+#include "unity.h"
 
 #define FFT_N               512U
 #define FFT_FORWARD_SHIFT   0x0U
@@ -36,6 +40,8 @@ enum _time_get
 float soft_power[FFT_N];
 float soft_angel[FFT_N];
 struct timeval get_time[FFT_COMPLEX_MAX][FFT_DIR_MAX][TEST_TIME_MAX];
+
+SemaphoreHandle_t matrix_sem = NULL;
 
 void fft_task(void *arg)
 {
@@ -96,27 +102,35 @@ void fft_task(void *arg)
             (get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_STOP].tv_usec - get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_START].tv_usec),
             (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_sec -get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_sec) * 1000*1000 +
             (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_usec - get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_usec));
-
+    xSemaphoreGive(matrix_sem);
     while (1) {
         vTaskDelay(10 / portTICK_RATE_MS);
     }
     vTaskDelete(NULL);
 }
 
-void test_task(void *arg)
+void matrix_task(void *arg)
 {
-    uint32_t cnt = 0;
+    xSemaphoreTake(matrix_sem, portMAX_DELAY);
+    UnityBegin("matrix test");
+    RunMatrixTest();
+    RunMatrixAddTest();
+    RunMatrixSubTest();
+    RunMatrixMulTest();
+    RunMatrixInvTest();
+    UnityEnd();
     while (1) {
-        printf("hello kiterf! Count: %d\n", cnt++);
-        vTaskDelay(500 / portTICK_RATE_MS);
+        vTaskDelay(10 / portTICK_RATE_MS);
     }
     vTaskDelete(NULL);
 }
 
 void app_main()
 {
+    matrix_sem = xSemaphoreCreateBinary();
+    xSemaphoreTake(matrix_sem, 0);
     xTaskCreate(fft_task, "fft_task", 10240, NULL, 5, NULL);
-    xTaskCreate(test_task, "test_task", 2048, NULL, 5, NULL);
+    xTaskCreate(matrix_task, "matrix_task", 2048, NULL, 5, NULL);
     while (1) {
         vTaskDelay(10 / portTICK_RATE_MS);
     }
