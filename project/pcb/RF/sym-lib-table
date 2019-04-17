@@ -1,7 +1,8 @@
 (sym_lib_table
-  (lib (name PE42641)(type Legacy)(uri ${KIPRJMOD}/PE42641.lib)(options "")(descr ""))
-  (lib (name MGA68563)(type Legacy)(uri ${KIPRJMOD}/MGA68563.lib)(options "")(descr ""))
-  (lib (name SKY13251)(type Legacy)(uri ${KIPRJMOD}/SKY13251.lib)(options "")(descr ""))
-  (lib (name AD9288)(type Legacy)(uri ${KIPRJMOD}/AD9288.lib)(options "")(descr ""))
-  (lib (name SI5351A)(type Legacy)(uri ${KIPRJMOD}/SI5351A.lib)(options "")(descr ""))
+  (lib (name PE42641)(type Legacy)(uri ${KIPRJMOD}/lib/PE42641.lib)(options "")(descr ""))
+  (lib (name MGA68563)(type Legacy)(uri ${KIPRJMOD}/lib/MGA68563.lib)(options "")(descr ""))
+  (lib (name SKY13251)(type Legacy)(uri ${KIPRJMOD}/lib/SKY13251.lib)(options "")(descr ""))
+  (lib (name AD9288)(type Legacy)(uri ${KIPRJMOD}/lib/AD9288.lib)(options "")(descr ""))
+  (lib (name SI5351A)(type Legacy)(uri ${KIPRJMOD}/lib/SI5351A.lib)(options "")(descr ""))
+  (lib (name MSI)(type Legacy)(uri ${KIPRJMOD}/lib/MSI.lib)(options "")(descr ""))
 )

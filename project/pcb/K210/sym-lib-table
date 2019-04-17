@@ -1,5 +1,7 @@
 (sym_lib_table
-  (lib (name MAX803)(type Legacy)(uri /home/life/KICAD/ESP32_K210/lib/MAX803.lib)(options "")(descr ""))
+  (lib (name MAX803)(type Legacy)(uri ${KIPRJMOD}/lib/MAX803.lib)(options "")(descr ""))
   (lib (name ESP32_K210-rescue)(type Legacy)(uri ${KIPRJMOD}/ESP32_K210-rescue.lib)(options "")(descr ""))
-  (lib (name TPS65053)(type Legacy)(uri /home/life/KICAD/ESP32_K210/lib/TPS65053.lib)(options "")(descr ""))
+  (lib (name TPS65053)(type Legacy)(uri ${KIPRJMOD}/lib/TPS65053.lib)(options "")(descr ""))
+  (lib (name k210)(type Legacy)(uri ${KIPRJMOD}/lib/k210.lib)(options "")(descr ""))
+  (lib (name w25q32)(type Legacy)(uri ${KIPRJMOD}/lib/w25q32.lib)(options "")(descr ""))
 )
