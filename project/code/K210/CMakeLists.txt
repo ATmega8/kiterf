@@ -21,13 +21,15 @@ add_source_files("main/main.c"
                  "components/mmo/test/matrix_mul_test.c" 
                  "components/mmo/test/matrix_sub_test.c" 
                  "components/mmo/test/matrix_test.c" 
-                 "components/unity/unity.c")
+                 "components/unity/unity.c"
+		 "components/fir/fir.c")
                  
 ## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
 header_directories("components/mmo/include")
 header_directories("components/mmo/test")
 header_directories("components/unity/include")
+header_directories("components/fir/include")
 # other cmake instructions
 
 ## Use SDK builder to build this project
