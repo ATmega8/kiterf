@@ -9,7 +9,6 @@ project(${PROJ})
 include("${SDK}/cmake/common.cmake")
 
 ## Use SDK library API to add source files
-
 add_source_files("main/*.c")
 add_source_files("components/fft_soft/*.c")
 add_source_files("components/mmo/*.c")
@@ -25,6 +24,8 @@ add_source_files("components/dsp/basic/*.c"
                  "components/dsp/statistics/*.c" 
                  "components/dsp/tables/*.c" 
                  "components/dsp/transform/*.c")
+add_source_files("components/fir/*.c")
+
                  
 ## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
@@ -33,6 +34,7 @@ header_directories("components/mmo/test")
 header_directories("components/unity/include")
 header_directories("components/ring_buf/include")
 header_directories("components/dsp//include")
+header_directories("components/fir/include")
 
 # other cmake instructions
 
