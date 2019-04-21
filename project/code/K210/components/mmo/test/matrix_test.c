@@ -3,7 +3,7 @@
 
 void testMatrixCreate(void)
 {
-    MATRIX_TypeDef* A = MATRIX_Create(4, 4);
+    MATRIX_TypeDef *A = MATRIX_Create(4, 4);
 
     TEST_ASSERT_NOT_NULL(A);
     TEST_ASSERT_NOT_NULL(A->pdata);
@@ -15,7 +15,7 @@ void testMatrixSetAndGet(void)
 {
     MATRIX_DATATYPE setData, getData;
 
-    MATRIX_TypeDef* A = MATRIX_Create(4, 4);
+    MATRIX_TypeDef *A = MATRIX_Create(4, 4);
 
     setData = 1.31;
 

@@ -1,5 +1,6 @@
 # _KiteRF_
 
+[![Build](https://travis-ci.org/ATmega8/kiterf.svg?branch=master "build badge")](https://travis-ci.org/ATmega8/kiterf "build")
 ![Version](https://img.shields.io/badge/version-1.0.0-yellow.svg)
 [![Release](https://img.shields.io/github/release/ATmega8/kiterf.svg "release badge")](https://github.com/ATmega8/kiterf/releases/latest/ "release")
 [![Release](https://img.shields.io/github/issues/ATmega8/kiterf.svg "issues badge")](https://github.com/ATmega8/kiterf/issues "issues")
