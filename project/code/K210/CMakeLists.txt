@@ -25,7 +25,7 @@ add_source_files("components/dsp/basic/*.c"
                  "components/dsp/tables/*.c" 
                  "components/dsp/transform/*.c")
 add_source_files("components/fir/*.c")
-
+add_source_files("components/pid/*.c")
                  
 ## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
@@ -35,6 +35,7 @@ header_directories("components/unity/include")
 header_directories("components/ring_buf/include")
 header_directories("components/dsp//include")
 header_directories("components/fir/include")
+header_directories("components/pid/include")
 
 # other cmake instructions
 
