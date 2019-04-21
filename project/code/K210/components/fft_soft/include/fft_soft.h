@@ -8,7 +8,9 @@ extern "C" {
 
 #define SWAP(a, b) do {complex t = (a); (a) = (b); (b) = t;} while(0)
 
-typedef struct{double real, imag;} complex;
+typedef struct {
+    double real, imag;
+} complex;
 
 void fft_soft(complex *data, int n);
 void ifft_soft(complex *data, int n);
