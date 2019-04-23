@@ -1,0 +1,107 @@
+# This is Doxygen configuration file
+#
+# Doxygen provides over 260 configuration statements
+# To make this file easier to follow,
+# it contains only statements that are non-default
+#
+# NOTE:
+# It is recommended not to change defaults unless specifically required
+# Test any changes how they affect generated documentation
+# Make sure that correct warnings are generated to flag issues with documented code
+#
+# For the complete list of configuration statements see:
+# https://www.stack.nl/~dimitri/doxygen/manual/config.html
+
+
+PROJECT_NAME = "KiteRF Programming Guide"
+
+## The 'INPUT' statement below is used as input by script 'gen-df-input.py'
+## to automatically generate API reference list files heder_file.inc
+## These files are placed in '_inc' directory
+## and used to include in API reference documentation
+
+INPUT                  = \
+                       ##
+                       ## ESP32 - DSP reference
+                       ##
+                       ../project/code/ESP32/components/dsp/include \
+                       ##
+                       ## ESP32 - fft_soft reference
+                       ##
+                       ../project/code/ESP32/components/fft_soft/include \
+                       ##
+                       ## ESP32 - mmo reference
+                       ##
+                       ../project/code/ESP32/components/mmo/include \
+                       ##
+                       ## ESP32 - pid reference
+                       ##
+                       ../project/code/ESP32/components/pid/include \
+                       ##
+                       ## ESP32 - ring_buf reference
+                       ##
+                       ../project/code/ESP32/components/ring_buf/include \
+                       ##
+                       ## ESP32 - unity reference
+                       ##
+                       ../project/code/ESP32/components/unity/include \
+                       ##
+                       ## K210 - DSP reference
+                       ##
+                       ../project/code/K210/components/dsp/include \
+                       ##
+                       ## K210 - fft_soft reference
+                       ##
+                       ../project/code/K210/components/fft_soft/include \
+                       ##
+                       ## K210 - mmo reference
+                       ##
+                       ../project/code/K210/components/mmo/include \
+                       ##
+                       ## K210 - pid reference
+                       ##
+                       ../project/code/K210/components/pid/include \
+                       ##
+                       ## K210 - ring_buf reference
+                       ##
+                       ../project/code/K210/components/ring_buf/include \
+                       ##
+                       ## K210 - unity reference
+                       ##
+                       ../project/code/K210/components/unity/include \
+                       ##
+                       ## K210 - fir reference
+                       ##
+                       ../project/code/K210/components/fir/include 
+## Get warnings for functions that have no documentation for their parameters or return value
+##
+WARN_NO_PARAMDOC = YES
+
+## Enable preprocessing and remove __attribute__(...) expressions from the INPUT files
+##
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = 
+
+## Do not complain about not having dot
+##
+HAVE_DOT = NO
+
+## Generate XML that is required for Breathe
+##
+GENERATE_XML    = YES
+XML_OUTPUT      = xml
+
+GENERATE_HTML   = YES
+HAVE_DOT        = NO
+GENERATE_LATEX  = NO
+GENERATE_MAN    = YES
+GENERATE_RTF    = NO
+
+## Skip distracting progress messages
+##
+QUIET = YES
+## Log warnings in a file for further review
+##
+WARN_LOGFILE = "doxygen-warning-log.txt"
