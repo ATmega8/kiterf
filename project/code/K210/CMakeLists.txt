@@ -9,25 +9,34 @@ project(${PROJ})
 include("${SDK}/cmake/common.cmake")
 
 ## Use SDK library API to add source files
-add_source_files("main/main.c"
-                 "components/fft_soft/fft_soft.c"
-                 "components/mmo/matrix_add.c" 
-                 "components/mmo/matrix_inv.c" 
-                 "components/mmo/matrix_mul.c" 
-                 "components/mmo/matrix_sub.c" 
-                 "components/mmo/matrix.c" 
-                 "components/mmo/test/matrix_add_test.c" 
-                 "components/mmo/test/matrix_inv_test.c" 
-                 "components/mmo/test/matrix_mul_test.c" 
-                 "components/mmo/test/matrix_sub_test.c" 
-                 "components/mmo/test/matrix_test.c" 
-                 "components/unity/unity.c")
+add_source_files("main/*.c")
+add_source_files("components/fft_soft/*.c")
+add_source_files("components/mmo/*.c")
+add_source_files("components/mmo/test/*.c") 
+add_source_files("components/unity/*.c")
+add_source_files("components/ring_buf/*.c")
+add_source_files("components/dsp/basic/*.c" 
+                 "components/dsp/complex/*.c" 
+                 "components/dsp/controller/*.c" 
+                 "components/dsp/fast/*.c" 
+                 "components/dsp/filter/*.c" 
+                 "components/dsp/matrix/*.c" 
+                 "components/dsp/statistics/*.c" 
+                 "components/dsp/tables/*.c" 
+                 "components/dsp/transform/*.c")
+add_source_files("components/fir/*.c")
+add_source_files("components/pid/*.c")
                  
 ## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
 header_directories("components/mmo/include")
 header_directories("components/mmo/test")
 header_directories("components/unity/include")
+header_directories("components/ring_buf/include")
+header_directories("components/dsp//include")
+header_directories("components/fir/include")
+header_directories("components/pid/include")
+
 # other cmake instructions
 
 ## Use SDK builder to build this project
