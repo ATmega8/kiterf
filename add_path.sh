@@ -1,4 +1,8 @@
-export TOOL_PATH=$PWD/tools
+## KiteRF PATH Register
+export KITERF_PATH=$PWD
+
+## TOOL PATH Register
+export TOOL_PATH=$KITERF_PATH/tools
 export K210_TOOLCHAIN_PATH=$TOOL_PATH/K210/kendryte-toolchain/bin
 export K210_SDK_PATH=$TOOL_PATH/K210/kendryte-freertos-sdk
 export K210_KFLASH_PATH=$TOOL_PATH/K210/kflash 
