@@ -11,6 +11,7 @@ else
 fi
 if [ $? -ne 0 ]; then
     echo "build failed"
+    echo "Please try to delete build dir and execute this script again!"
     cd ..
     exit 1
 else

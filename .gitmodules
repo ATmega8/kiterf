@@ -7,3 +7,9 @@
 [submodule "tools/K210/kflash"]
 	path = tools/K210/kflash
 	url = https://github.com/kendryte/kflash.py.git
+[submodule "project/code/ESP32/components/littlevgl/lvgl"]
+	path = project/code/ESP32/components/littlevgl/lvgl
+	url = https://github.com/littlevgl/lvgl.git
+[submodule "project/code/K210/components/littlevgl/lvgl"]
+	path = project/code/K210/components/littlevgl/lvgl
+	url = https://github.com/littlevgl/lvgl
