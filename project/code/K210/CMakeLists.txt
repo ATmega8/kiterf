@@ -26,6 +26,13 @@ add_source_files("components/dsp/basic/*.c"
                  "components/dsp/transform/*.c")
 add_source_files("components/fir/*.c")
 add_source_files("components/pid/*.c")
+add_source_files("components/littlevgl/lvgl/lv_core/*.c" 
+                 "components/littlevgl/lvgl/lv_hal/*.c"
+                 "components/littlevgl/lvgl/lv_objx/*.c"
+                 "components/littlevgl/lvgl/lv_fonts/*.c" 
+                 "components/littlevgl/lvgl/lv_misc/*.c"
+                 "components/littlevgl/lvgl/lv_themes/*.c"
+                 "components/littlevgl/lvgl/lv_draw/*.c")
                  
 ## I don't know why I need to add every item !!!
 header_directories("components/fft_soft/include")
@@ -36,6 +43,15 @@ header_directories("components/ring_buf/include")
 header_directories("components/dsp//include")
 header_directories("components/fir/include")
 header_directories("components/pid/include")
+header_directories("components/littlevgl/.")
+header_directories("components/littlevgl/lvgl")
+header_directories("components/littlevgl/lvgl/lv_core")
+header_directories("components/littlevgl/lvgl/lv_hal")
+header_directories("components/littlevgl/lvgl/lv_objx")
+header_directories("components/littlevgl/lvgl/lv_fonts")
+header_directories("components/littlevgl/lvgl/lv_misc")
+header_directories("components/littlevgl/lvgl/lv_themes")
+header_directories("components/littlevgl/lvgl/lv_draw") 
 
 # other cmake instructions
 

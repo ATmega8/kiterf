@@ -13,6 +13,7 @@
 #include "test.h"
 #include "unity.h"
 #include "dsp_math.h"
+#include "lvgl.h"
 
 #define FFT_N               512U
 /**
@@ -307,6 +308,31 @@ void dsp_task(void *arg)
     vTaskSuspend(NULL);
 }
 
+void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
+{
+    int32_t x, y;
+    for(y = y1; y <= y2; y++) {
+        for(x = x1; x <= x2; x++) {
+            // sep_pixel(x, y, color_p->full);  /* Put a pixel to the display.*/
+            color_p++;
+        }
+    }
+    lv_flush_ready();
+}
+
+void lvgl_task(void *arg)
+{
+    lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
+    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+    disp_drv.disp_flush = lvgl_disp_flush;     /*Set your driver function*/
+    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+
+    while (1) {
+        lv_task_handler();
+        vTaskDelay(10 / portTICK_RATE_MS);
+    }
+}
+
 int main()
 {
     matrix_sem = xSemaphoreCreateBinary();
@@ -317,6 +343,7 @@ int main()
     xTaskCreate(fft_task, "fft_task", 2560 * 1, NULL, 5, NULL);
     xTaskCreate(matrix_task, "matrix_task", 512 * 1, NULL, 5, NULL);
     xTaskCreate(dsp_task, "dsp_task", 1024 * 1, NULL, 5, NULL);
+    xTaskCreate(lvgl_task, "lvgl_task", 1024 * 1, NULL, 5, NULL);
 
     vTaskSuspend(NULL);
     return 0;
