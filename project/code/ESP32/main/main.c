@@ -14,6 +14,7 @@
 #include "unity.h"
 #include "dsp_math.h"
 #include "lvgl.h"
+#include "lcd.h"
 
 #define FFT_N               512U
 #define FFT_FORWARD_SHIFT   0x0U
@@ -218,19 +219,24 @@ void dsp_task(void *arg)
     for (i = 0; i < 64; i = i + 4) {
         printf("[%f, %f, %f, %f]\n", ifft_res[i], ifft_res[i + 1], ifft_res[i + 2], ifft_res[i + 3]);
     }
-
+    printf("heap: %d\n", esp_get_free_heap_size());
     vTaskSuspend(NULL);
 }
 
-void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
+
+
+void IRAM_ATTR lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
 {
-    int32_t x, y;
-    for(y = y1; y <= y2; y++) {
-        for(x = x1; x <= x2; x++) {
-            // sep_pixel(x, y, color_p->full);  /* Put a pixel to the display.*/
-            color_p++;
-        }
+    int32_t x;
+    uint32_t len = (y2 - y1 + 1)*(x2 - x1 + 1);
+
+    lcd_set_index(x1, y1, x2, y2);
+    for (x = 0; x < len / LCD_BURST_MAX_LEN; x++) {
+        lcd_write_data((uint16_t *)color_p, LCD_BURST_MAX_LEN);
+        color_p +=  LCD_BURST_MAX_LEN;
     }
+    lcd_write_data((uint16_t *)color_p, len % LCD_BURST_MAX_LEN);
+
     lv_flush_ready();
 }
 
@@ -240,6 +246,74 @@ void lvgl_task(void *arg)
     lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
     disp_drv.disp_flush = lvgl_disp_flush;     /*Set your driver function*/
     lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+
+    /*Create a Calendar object*/
+    lv_obj_t * calendar = lv_calendar_create(lv_scr_act(), NULL);
+    lv_obj_set_size(calendar, 240, 220);
+    lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
+
+    /*Create a style for the current week*/
+    static lv_style_t style_week_box;
+    lv_style_copy(&style_week_box, &lv_style_plain);
+    style_week_box.body.border.width = 1;
+    style_week_box.body.border.color = LV_COLOR_HEX3(0x333);
+    style_week_box.body.empty = 1;
+    style_week_box.body.radius = LV_RADIUS_CIRCLE;
+    style_week_box.body.padding.ver = 3;
+    style_week_box.body.padding.hor = 3;
+
+    /*Create a style for today*/
+    static lv_style_t style_today_box;
+    lv_style_copy(&style_today_box, &lv_style_plain);
+    style_today_box.body.border.width = 2;
+    style_today_box.body.border.color = LV_COLOR_NAVY;
+    style_today_box.body.empty = 1;
+    style_today_box.body.radius = LV_RADIUS_CIRCLE;
+    style_today_box.body.padding.ver = 3;
+    style_today_box.body.padding.hor = 3;
+    style_today_box.text.color= LV_COLOR_BLUE;
+
+    /*Create a style for the highlighted days*/
+    static lv_style_t style_highlighted_day;
+    lv_style_copy(&style_highlighted_day, &lv_style_plain);
+    style_highlighted_day.body.border.width = 2;
+    style_highlighted_day.body.border.color = LV_COLOR_NAVY;
+    style_highlighted_day.body.empty = 1;
+    style_highlighted_day.body.radius = LV_RADIUS_CIRCLE;
+    style_highlighted_day.body.padding.ver = 3;
+    style_highlighted_day.body.padding.hor = 3;
+    style_highlighted_day.text.color= LV_COLOR_BLUE;
+
+    /*Apply the styles*/
+    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_WEEK_BOX, &style_week_box);
+    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_TODAY_BOX, &style_today_box);
+    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, &style_highlighted_day);
+
+
+    /*Set the today*/
+    lv_calendar_date_t today;
+    today.year = 2018;
+    today.month = 10;
+    today.day = 23;
+
+    lv_calendar_set_today_date(calendar, &today);
+    lv_calendar_set_showed_date(calendar, &today);
+
+    /*Highlight some days*/
+    static lv_calendar_date_t highlihted_days[3];       /*Only it's pointer will be saved so should be static*/
+    highlihted_days[0].year = 2018;
+    highlihted_days[0].month = 10;
+    highlihted_days[0].day = 6;
+
+    highlihted_days[1].year = 2018;
+    highlihted_days[1].month = 10;
+    highlihted_days[1].day = 11;
+
+    highlihted_days[2].year = 2018;
+    highlihted_days[2].month = 11;
+    highlihted_days[2].day = 22;
+
+    lv_calendar_set_highlighted_dates(calendar, highlihted_days, 3);
 
     while (1) {
         lv_task_handler();
@@ -255,6 +329,7 @@ void app_main()
     xSemaphoreTake(dsp_sem, 0);
 
     lv_init();
+    lcd_init();
 
     xTaskCreate(fft_task, "fft_task", 2560 * 4, NULL, 5, NULL);
     xTaskCreate(matrix_task, "matrix_task", 512 * 4, NULL, 5, NULL);

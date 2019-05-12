@@ -308,15 +308,19 @@ void dsp_task(void *arg)
     vTaskSuspend(NULL);
 }
 
+#define LCD_BURST_MAX_LEN (LV_HOR_RES * 4)  // // Maximum pixel data transferred at a time
+
 void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
 {
-    int32_t x, y;
-    for(y = y1; y <= y2; y++) {
-        for(x = x1; x <= x2; x++) {
-            // sep_pixel(x, y, color_p->full);  /* Put a pixel to the display.*/
-            color_p++;
-        }
+    int32_t x;
+    uint32_t len = (y2 - y1 + 1)*(x2 - x1 + 1);
+
+    // lcd_set_index(x1, y1, x2, y2);
+    for (x = 0; x < len / LCD_BURST_MAX_LEN; x++) {
+        // lcd_write_data((uint16_t *)color_p, LCD_BURST_MAX_LEN);
+        color_p +=  LCD_BURST_MAX_LEN;
     }
+    // lcd_write_data((uint16_t *)color_p, len % LCD_BURST_MAX_LEN);
     lv_flush_ready();
 }
 
