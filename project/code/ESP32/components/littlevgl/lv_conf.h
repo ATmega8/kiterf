@@ -19,7 +19,7 @@
  * to store the graphical objects and other data */
 #define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #if LV_MEM_CUSTOM == 0
-#  define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#  define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
 #  define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
 #  define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
@@ -43,8 +43,8 @@
  *===================*/
 
 /* Horizontal and vertical resolution of the library.*/
-#define LV_HOR_RES          (480)
-#define LV_VER_RES          (320)
+#define LV_HOR_RES          (320)
+#define LV_VER_RES          (240)
 
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
@@ -113,7 +113,7 @@
 
 /*Color settings*/
 #define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
-#define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
+#define LV_COLOR_16_SWAP   1                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
 
