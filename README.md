@@ -157,6 +157,15 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
   git submodule update --init --recursive
   ```
 
+* Add environment variables
+
+  ```bash
+  . add_path.sh
+  ```
+  * note
+
+    Don't forget `"."`
+
 * Install toolchain
 
   * K210
@@ -187,14 +196,19 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
       rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
       ```
 
-* Add environment variables
+  * CMake
 
-  ```bash
-  . add_path.sh
-  ```
-  * note
+    * Ubuntu/Debian/Kali/Arch
 
-    Don't forget `"."`
+      ```bash
+      wget https://github.com/Kitware/CMake/releases/download/v3.14.2/cmake-3.14.2.tar.gz
+      tar xf cmake-3.14.2.tar.gz -C tools/
+      cd tools/cmake-3.14.2
+      ./configure
+      make
+      cd $KITERF_PATH
+      rm cmake-3.14.2.tar.gz
+      ```
 
 ## License
 
