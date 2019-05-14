@@ -173,7 +173,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     * Ubuntu/Debian/Kali
 
       ```bash
-      wget https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+      wget https://www.kiterf.xyz/download/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
       tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/K210/
       rm kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
       ```
@@ -191,7 +191,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     * Ubuntu/Debian/Kali/Arch
 
       ```bash
-      wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+      wget https://www.kiterf.xyz/download/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
       tar zxvf xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz -C tools/ESP32/
       rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
       ```
@@ -201,11 +201,12 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     * Ubuntu/Debian/Kali/Arch
 
       ```bash
-      wget https://github.com/Kitware/CMake/releases/download/v3.14.2/cmake-3.14.2.tar.gz
+      wget https://www.kiterf.xyz/download/cmake-3.14.2.tar.gz
       tar xf cmake-3.14.2.tar.gz -C tools/
       cd tools/cmake-3.14.2
       ./configure
-      make
+      # Please do not use all CPU cores to compile, otherwise your computer may crash.
+      make -j2
       cd $KITERF_PATH
       rm cmake-3.14.2.tar.gz
       ```

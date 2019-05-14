@@ -19,18 +19,29 @@ cache:
 - directories:
   - tools/K210/kendryte-toolchain
   - tools/ESP32/xtensa-esp32-elf
+  - tools/cmake-3.14.2
 before_install:
 - openssl aes-256-cbc -K $encrypted_0e2adedb83b2_key -iv $encrypted_0e2adedb83b2_iv
   -in .travis/id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
 - echo -e "Host $HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-- cmake --version
 install:
 - cd $TRAVIS_BUILD_DIR
+# - |
+#   if [ ! -d "tools/cmake-3.14.2/bin" ]; then
+#     echo "Download cmake-3.14.2 ..."
+#     wget https://$HOST/download/cmake-3.14.2.tar.gz
+#     tar xf cmake-3.14.2.tar.gz -C tools/
+#     cd tools/cmake-3.14.2
+#     ./configure
+#     make
+#   else
+#     echo "cmake-3.14.2 is already download in cache"
+#   fi
 - |
   if [ ! -d "tools/K210/kendryte-toolchain/bin" ]; then
     echo "Download K210 toolchain ..."
-    wget https://github.com/kendryte/kendryte-gnu-toolchain/releases/download/v8.2.0-20190213/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
+    wget https://$HOST/download/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
     tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/K210/
   else
     echo "K210 toolchain is already download in cache"
@@ -38,18 +49,19 @@ install:
 - |
   if [ ! -d "tools/ESP32/xtensa-esp32-elf/bin" ]; then
     echo "Download ESP32 toolchain ..."
-    wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+    wget https://$HOST/download/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
     tar zxvf xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz -C tools/ESP32/
   else
     echo "ESP32 toolchain is already download in cache"
   fi
 before_script:
 - cd $TRAVIS_BUILD_DIR
-- ". add_path.sh"
+- . add_path.sh
 - python -m pip install --user -r $TRAVIS_BUILD_DIR/tools/ESP32/esp-idf/requirements.txt
+- cmake --version
 script:
 - cd $TRAVIS_BUILD_DIR/project/code/K210
-- "./build.sh"
+- ./build.sh
 - cd $TRAVIS_BUILD_DIR/project/code/ESP32
 - idf.py build
 - make defconfig

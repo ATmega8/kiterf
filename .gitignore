@@ -2,6 +2,8 @@
 .config
 *.o
 *.pyc
+project/**/sdkconfig
+project/**/sdkconfig.old
 
 # emacs
 .dir-locals.el
