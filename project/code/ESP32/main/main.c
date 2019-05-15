@@ -321,20 +321,12 @@ void lvgl_task(void *arg)
     }
 }
 
-#define RF_SPI_HANDSHAKE_TEST
-#ifdef RF_SPI_HANDSHAKE_TEST
-#define RF_SPI_SLAVE_PIN_HANDSHAKE 2
-#define RF_SPI_MASTER_PIN_HANDSHAKE 2
-#endif
 
 #include "rf_spi_slave.h"
 
 void IRAM_ATTR rf_spi_slave_trans_start_callback(int len)
 {
     ets_printf("Hi master, I've filled %d byte data ready, please start transmission\n", len);
-    #ifdef RF_SPI_HANDSHAKE_TEST
-        WRITE_PERI_REG(GPIO_OUT_W1TS_REG, (1 << RF_SPI_SLAVE_PIN_HANDSHAKE));
-    #endif
 }
 
 void rf_spi_slave_test_task(void *arg)
@@ -343,34 +335,21 @@ void rf_spi_slave_test_task(void *arg)
     int count = 0;
     char data[512];
     rf_spi_slave_config_t config;
-    config.trans_max_len = 128;
+    config.trans_max_len = 512;
     config.trans_start_cb = rf_spi_slave_trans_start_callback;
     rf_spi_slave_init(&config);
-#ifdef RF_SPI_HANDSHAKE_TEST
-    //Configuration for the handshake line
-    gpio_config_t io_conf = {
-        .intr_type = GPIO_INTR_DISABLE,
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = (1 << RF_SPI_SLAVE_PIN_HANDSHAKE)
-    };
-
-    //Configure handshake line as output
-    gpio_config(&io_conf);
-#endif
     while (1) {
         memset(data, 0, sizeof(uint8_t) * 512);
         sprintf(data, "Hello master: %d\n", count++);
-
         ret_len = rf_spi_slave_send_recv((uint8_t *)data, 512, portMAX_DELAY);
-        #ifdef RF_SPI_HANDSHAKE_TEST
-            WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1 << RF_SPI_SLAVE_PIN_HANDSHAKE));
-        #endif
         printf("%s", data);
         vTaskDelay(100 / portTICK_RATE_MS);
     }
 }
 
 #include "rf_spi_master.h"
+
+#define GPIO_HANDSHAKE 2
 
 //The semaphore indicating the slave is ready to receive stuff.
 static xQueueHandle rdySem;
@@ -399,7 +378,7 @@ void rf_spi_master_test_task(void *arg)
     int count = 0;
     char data[512];
     rf_spi_master_config_t config;
-    config.trans_max_len = 128;
+    config.trans_max_len = 512;
     rf_spi_master_init(&config);
 
     //Create the semaphore.
@@ -409,13 +388,13 @@ void rf_spi_master_test_task(void *arg)
         .intr_type = GPIO_PIN_INTR_POSEDGE,
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 1,
-        .pin_bit_mask = (1 << RF_SPI_MASTER_PIN_HANDSHAKE)
+        .pin_bit_mask = (1 << GPIO_HANDSHAKE)
     };
     //Set up handshake line interrupt.
     gpio_config(&io_conf);
     gpio_install_isr_service(0);
-    gpio_set_intr_type(RF_SPI_MASTER_PIN_HANDSHAKE, GPIO_PIN_INTR_POSEDGE);
-    gpio_isr_handler_add(RF_SPI_MASTER_PIN_HANDSHAKE, gpio_handshake_isr_handler, NULL);
+    gpio_set_intr_type(GPIO_HANDSHAKE, GPIO_PIN_INTR_POSEDGE);
+    gpio_isr_handler_add(GPIO_HANDSHAKE, gpio_handshake_isr_handler, NULL);
 
     xSemaphoreGive(rdySem);
     while (1) {

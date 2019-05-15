@@ -6,6 +6,11 @@
 extern "C" {
 #endif
 
+#define RF_SPI_SLAVE_HANDSHAKE_TEST
+#ifdef RF_SPI_SLAVE_HANDSHAKE_TEST
+#define RF_SPI_SLAVE_PIN_HANDSHAKE 2
+#endif
+
 #define RF_SPI_SLAVE_PIN_SCLK 33
 #define RF_SPI_SLAVE_PIN_MISO 25
 #define RF_SPI_SLAVE_PIN_MOSI 26

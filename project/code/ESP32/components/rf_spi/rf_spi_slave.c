@@ -29,6 +29,9 @@ rf_spi_slave_obj_t *rf_spi_slave_obj = NULL;
 
 static void IRAM_ATTR rf_spi_slave_trans_setup_cb(spi_slave_transaction_t *trans) 
 {
+#ifdef RF_SPI_SLAVE_HANDSHAKE_TEST
+    WRITE_PERI_REG(GPIO_OUT_W1TS_REG, (1<<RF_SPI_SLAVE_PIN_HANDSHAKE));
+#endif
     if (rf_spi_slave_obj->trans_start_cb) {
         rf_spi_slave_obj->trans_start_cb(trans->length / 8);
     }
@@ -37,6 +40,9 @@ static void IRAM_ATTR rf_spi_slave_trans_setup_cb(spi_slave_transaction_t *trans
 
 static void IRAM_ATTR rf_spi_slave_trans_post_cb(spi_slave_transaction_t *trans) 
 {
+#ifdef RF_SPI_SLAVE_HANDSHAKE_TEST
+    WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1<<RF_SPI_SLAVE_PIN_HANDSHAKE));
+#endif
     if (rf_spi_slave_obj->trans_done_cb) {
         rf_spi_slave_obj->trans_done_cb(trans->length / 8);
     }
@@ -94,6 +100,10 @@ int rf_spi_slave_send_recv(uint8_t *data, int len, uint32_t timeout_ticks)
         printf("argc error: %s, %d\n", __func__, __LINE__);
         return -1;
     }
+    if (len > rf_spi_slave_obj->trans_max_len) {
+        printf("Slave temporarily does not support subpacket transmission: %s, %d\n", __func__, __LINE__);
+        return -1;
+    }
 
     for (x = 0; x < len / rf_spi_slave_obj->trans_max_len; x++) {
         ret = rf_spi_slave_trans(data, rf_spi_slave_obj->trans_max_len, &timeout_ticks);
@@ -133,9 +143,21 @@ void rf_spi_slave_task(void *arg)
         .mode = 0,
         .spics_io_num = RF_SPI_SLAVE_PIN_CS,
         .queue_size = 3,
-        .flags =0
+        .flags =0,
+        .post_setup_cb = rf_spi_slave_trans_setup_cb,
+        .post_trans_cb = rf_spi_slave_trans_post_cb
+    };
+#ifdef RF_SPI_SLAVE_HANDSHAKE_TEST
+    //Configuration for the handshake line
+    gpio_config_t io_conf = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .mode = GPIO_MODE_OUTPUT,
+        .pin_bit_mask = (1 << RF_SPI_SLAVE_PIN_HANDSHAKE)
     };
 
+    //Configure handshake line as output
+    gpio_config(&io_conf);
+#endif
     //Enable pull-ups on SPI lines so we don't detect rogue pulses when no master is connected.
     gpio_set_pull_mode(RF_SPI_SLAVE_PIN_MOSI, GPIO_PULLUP_ONLY);
     gpio_set_pull_mode(RF_SPI_SLAVE_PIN_SCLK, GPIO_PULLUP_ONLY);
@@ -159,13 +181,8 @@ void rf_spi_slave_task(void *arg)
         }
         memset(rf_spi_slave_obj->recv_dma_buf, 0, rf_spi_slave_obj->trans_max_len);
         t.length = event.len * 8;
-        if (rf_spi_slave_obj->trans_start_cb) {
-            rf_spi_slave_obj->trans_start_cb(event.len);
-        }
         ret = spi_slave_transmit(HSPI_HOST, &t, portMAX_DELAY);
-        if (rf_spi_slave_obj->trans_done_cb) {
-            rf_spi_slave_obj->trans_done_cb(event.len);
-        }
+        
         if (ret != ESP_OK) {
             event.data = NULL;
         } else {

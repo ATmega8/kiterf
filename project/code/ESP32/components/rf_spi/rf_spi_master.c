@@ -27,6 +27,20 @@ typedef struct {
 
 rf_spi_master_obj_t *rf_spi_master_obj = NULL;
 
+static void IRAM_ATTR rf_spi_master_trans_setup_cb(spi_transaction_t *trans) 
+{
+    if (rf_spi_master_obj->trans_start_cb) {
+        rf_spi_master_obj->trans_start_cb(trans->length);
+    }
+}
+
+static void IRAM_ATTR rf_spi_master_trans_post_cb(spi_transaction_t *trans) 
+{
+    if (rf_spi_master_obj->trans_done_cb) {
+        rf_spi_master_obj->trans_done_cb(trans->length);
+    }
+}
+
 static int inline rf_spi_master_trans(uint8_t *data, int len, uint32_t *timeout_ticks)
 {
     int x;
@@ -126,7 +140,9 @@ void rf_spi_master_task(void *arg)
         .mode = 0,
         .spics_io_num = RF_SPI_MASTER_PIN_CS,
         .cs_ena_posttrans = 3,        //Keep the CS low 3 cycles after transaction, to stop slave from missing the last bit when CS has less propagation delay than CLK
-        .queue_size = 3
+        .queue_size = 3,
+        .pre_cb = rf_spi_master_trans_setup_cb,
+        .post_cb = rf_spi_master_trans_post_cb
     };
 
     ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
@@ -149,13 +165,8 @@ void rf_spi_master_task(void *arg)
         }
         memset(rf_spi_master_obj->recv_dma_buf, 0, rf_spi_master_obj->trans_max_len);
         t.length = event.len * 8;
-        if (rf_spi_master_obj->trans_start_cb) {
-            rf_spi_master_obj->trans_start_cb(event.len);
-        }
         ret = spi_device_transmit(handle, &t);
-        if (rf_spi_master_obj->trans_done_cb) {
-            rf_spi_master_obj->trans_done_cb(event.len);
-        }
+        
         if (ret != ESP_OK) {
             event.data = NULL;
         } else {
