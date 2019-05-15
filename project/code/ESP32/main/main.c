@@ -321,35 +321,72 @@ void lvgl_task(void *arg)
     }
 }
 
+#define RF_SPI_HANDSHAKE_TEST
 
+#include "flash_buf.h"
 #include "rf_spi_slave.h"
 
-void IRAM_ATTR rf_spi_slave_trans_start_callback(int len)
+#ifdef RF_SPI_HANDSHAKE_TEST
+#define RF_SPI_SLAVE_PIN_HANDSHAKE 2
+#endif
+
+void IRAM_ATTR rf_spi_slave_trans_start_callback(size_t len)
 {
+#ifdef RF_SPI_HANDSHAKE_TEST
+    WRITE_PERI_REG(GPIO_OUT_W1TS_REG, (1<<RF_SPI_SLAVE_PIN_HANDSHAKE));
+#endif
     ets_printf("Hi master, I've filled %d byte data ready, please start transmission\n", len);
+}
+
+void IRAM_ATTR rf_spi_slave_trans_done_callback(size_t len)
+{
+#ifdef RF_SPI_HANDSHAKE_TEST
+    WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1<<RF_SPI_SLAVE_PIN_HANDSHAKE));
+#endif
 }
 
 void rf_spi_slave_test_task(void *arg)
 {
-    int ret_len;
-    int count = 0;
-    char data[512];
+    int x = 0, y = 0;
+    int ret_len = 0;
+    int data[512] = {0};
     rf_spi_slave_config_t config;
-    config.trans_max_len = 512;
+    config.trans_max_len = sizeof(int) * 512;
     config.trans_start_cb = rf_spi_slave_trans_start_callback;
+    config.trans_done_cb = rf_spi_slave_trans_done_callback;
     rf_spi_slave_init(&config);
+    
+#ifdef RF_SPI_HANDSHAKE_TEST
+    //Configuration for the handshake line
+    gpio_config_t io_conf = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .mode = GPIO_MODE_OUTPUT,
+        .pin_bit_mask = (1 << RF_SPI_SLAVE_PIN_HANDSHAKE)
+    };
+
+    //Configure handshake line as output
+    gpio_config(&io_conf);
+#endif
+
     while (1) {
-        memset(data, 0, sizeof(uint8_t) * 512);
-        sprintf(data, "Hello master: %d\n", count++);
-        ret_len = rf_spi_slave_send_recv((uint8_t *)data, 512, portMAX_DELAY);
-        printf("%s", data);
-        vTaskDelay(100 / portTICK_RATE_MS);
+        printf("Send flash data start\n");
+        for (x = 0; x < flash_buf_get_size() / (sizeof(int) * 512); x++) {
+            memset(data, 0, sizeof(int) * 512);
+            flash_buf_read(x * sizeof(int) * 512, data, sizeof(int) * 512);
+            ret_len = rf_spi_slave_send_recv((void *)data, sizeof(int) * 512, portMAX_DELAY);
+            printf("%s, len:%d\n", (char *)data, ret_len);
+            vTaskDelay(100 / portTICK_RATE_MS);
+        }
+        printf("Send flash data done\n");
+        vTaskDelay(10000 / portTICK_RATE_MS);
     }
 }
 
 #include "rf_spi_master.h"
 
-#define GPIO_HANDSHAKE 2
+#ifdef RF_SPI_HANDSHAKE_TEST
+#define RF_SPI_MASTER_PIN_HANDSHAKE 2
+#endif
 
 //The semaphore indicating the slave is ready to receive stuff.
 static xQueueHandle rdySem;
@@ -375,10 +412,12 @@ static void IRAM_ATTR gpio_handshake_isr_handler(void* arg)
 
 void rf_spi_master_test_task(void *arg)
 {
+    int x;
+    int ret_len = 0;
     int count = 0;
-    char data[512];
+    int data[512] = {0};
     rf_spi_master_config_t config;
-    config.trans_max_len = 512;
+    config.trans_max_len = sizeof(int) * 512;
     rf_spi_master_init(&config);
 
     //Create the semaphore.
@@ -388,23 +427,36 @@ void rf_spi_master_test_task(void *arg)
         .intr_type = GPIO_PIN_INTR_POSEDGE,
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 1,
-        .pin_bit_mask = (1 << GPIO_HANDSHAKE)
+        .pin_bit_mask = (1 << RF_SPI_MASTER_PIN_HANDSHAKE)
     };
     //Set up handshake line interrupt.
     gpio_config(&io_conf);
     gpio_install_isr_service(0);
-    gpio_set_intr_type(GPIO_HANDSHAKE, GPIO_PIN_INTR_POSEDGE);
-    gpio_isr_handler_add(GPIO_HANDSHAKE, gpio_handshake_isr_handler, NULL);
+    gpio_set_intr_type(RF_SPI_MASTER_PIN_HANDSHAKE, GPIO_PIN_INTR_POSEDGE);
+    gpio_isr_handler_add(RF_SPI_MASTER_PIN_HANDSHAKE, gpio_handshake_isr_handler, NULL);
 
-    xSemaphoreGive(rdySem);
+    // xSemaphoreGive(rdySem);
     while (1) {
-        memset(data, 0, sizeof(uint8_t) * 512);
-        sprintf(data, "Hello slave: %d\n", count++);
+        memset(data, 0, sizeof(int) * 512);
+        sprintf((char *)data, "Hello slave: %d", count++);
         xSemaphoreTake(rdySem, portMAX_DELAY); //Wait until slave is ready
-        rf_spi_master_send_recv((uint8_t *)data, 512, portMAX_DELAY);
-        printf("%s", data);
+        ret_len = rf_spi_master_send_recv((void *)data, sizeof(int) * 512, portMAX_DELAY);
+        for (x = 0; x < ret_len / sizeof(int); x++) {
+            printf("%d ", data[x]);
+        }
+        printf("\nrecv_len: %d\n", ret_len);
+        
     }
 }
+
+#define RF_SPI_SLAVE_TEST
+
+#ifndef RF_SPI_SLAVE_TEST
+#define RF_SPI_MASTER_TEST
+#else
+#define TEST_BUF_SIZE 4096
+int test_buf[TEST_BUF_SIZE / 4] = {0};
+#endif
 
 void app_main()
 {
@@ -420,9 +472,22 @@ void app_main()
     // xTaskCreate(matrix_task, "matrix_task", 512 * 4, NULL, 5, NULL);
     // xTaskCreate(dsp_task, "dsp_task", 1024 * 4, NULL, 5, NULL);
     // xTaskCreate(lvgl_task, "lvgl_task", 1024 * 4, NULL, 5, NULL);
-
+#ifdef RF_SPI_SLAVE_TEST    
+    int x = 0;
+    flash_buf_init();
+    flash_buf_erase();
+    for (x = 0; x < TEST_BUF_SIZE / 4; x++) {
+        test_buf[x] = x;
+    }
+    for (x = 0; x < flash_buf_get_size() / TEST_BUF_SIZE; x++) {
+        flash_buf_write(x * TEST_BUF_SIZE, (void *)test_buf, TEST_BUF_SIZE);
+    }
+    flash_buf_write(x * TEST_BUF_SIZE, (void *)test_buf, flash_buf_get_size() % TEST_BUF_SIZE);
     xTaskCreate(rf_spi_slave_test_task, "rf_spi_slave_test_task", 1024 * 4, NULL, 5, NULL);
-    //xTaskCreate(rf_spi_master_test_task, "rf_spi_master_test_task", 1024 * 4, NULL, 5, NULL);
+#endif
+#ifdef RF_SPI_MASTER_TEST
+    xTaskCreate(rf_spi_master_test_task, "rf_spi_master_test_task", 1024 * 4, NULL, 5, NULL);
+#endif
 
     vTaskSuspend(NULL);
 }

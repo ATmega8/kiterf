@@ -1,7 +1,9 @@
 
 #include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -11,18 +13,18 @@
 #include "rf_spi_master.h"
 
 typedef struct {
-    uint8_t *data;
-    int len;
+    void *data;
+    size_t len;
 } rf_spi_master_event_t;
 
 typedef struct {
-    int trans_max_len;
+    size_t trans_max_len;
     rf_spi_master_callback_t trans_start_cb;
     rf_spi_master_callback_t trans_done_cb;
     QueueHandle_t send_queue;
     QueueHandle_t recv_queue;
-    uint8_t *send_dma_buf;
-    uint8_t *recv_dma_buf;
+    void *send_dma_buf;
+    void *recv_dma_buf;
 } rf_spi_master_obj_t;
 
 rf_spi_master_obj_t *rf_spi_master_obj = NULL;
@@ -41,12 +43,12 @@ static void IRAM_ATTR rf_spi_master_trans_post_cb(spi_transaction_t *trans)
     }
 }
 
-static int inline rf_spi_master_trans(uint8_t *data, int len, uint32_t *timeout_ticks)
+static int inline rf_spi_master_trans(void *data, size_t len, uint32_t *timeout_ticks)
 {
-    int x;
+    int x = 0;
     int ret = 0;
-    rf_spi_master_event_t event;
-    uint32_t ticks_escape, ticks_last;
+    rf_spi_master_event_t event = {0};
+    uint32_t ticks_escape = 0, ticks_last = 0;
     if (len == 0) {
         return 0;
     }
@@ -77,21 +79,20 @@ static int inline rf_spi_master_trans(uint8_t *data, int len, uint32_t *timeout_
     if (ret == pdFALSE || event.data == NULL) {
         return -1;
     }
-    for (x = 0; x < event.len; x++) {
-        data[x] = event.data[x];
-    } 
+    memcpy(data, event.data, event.len);
 
     return event.len;
 }
 
-int rf_spi_master_send_recv(uint8_t *data, int len, uint32_t timeout_ticks)
+int rf_spi_master_send_recv(void *data, size_t len, uint32_t timeout_ticks)
 {
-    int ret = 0;
-    int ret_len = 0;
-    int x;
-    if (rf_spi_master_obj == NULL || data == NULL || len < 0) {
-        printf("argc error: %s, %d\n", __func__, __LINE__);
-        return -1;
+    int x = 0;
+    size_t ret = 0;
+    size_t ret_len = 0;
+    assert(rf_spi_master_obj != NULL && data != NULL);
+
+    if (len == 0) {
+        return 0;
     }
 
     for (x = 0; x < len / rf_spi_master_obj->trans_max_len; x++) {
@@ -117,9 +118,8 @@ int rf_spi_master_send_recv(uint8_t *data, int len, uint32_t timeout_ticks)
 
 void rf_spi_master_task(void *arg)
 {
-    int x;
-    esp_err_t ret;
-    spi_device_handle_t handle;
+    esp_err_t ret = 0;
+    spi_device_handle_t handle = NULL;
     
     //Configuration for the SPI bus
     spi_bus_config_t buscfg = {
@@ -150,8 +150,8 @@ void rf_spi_master_task(void *arg)
     ret = spi_bus_add_device(HSPI_HOST, &devcfg, &handle);
     assert(ret == ESP_OK);
 
-    spi_transaction_t t;
-    rf_spi_master_event_t event;
+    spi_transaction_t t = {0};
+    rf_spi_master_event_t event = {0};
     memset(&t, 0, sizeof(t));
     t.tx_buffer = rf_spi_master_obj->send_dma_buf;
     t.rx_buffer = rf_spi_master_obj->recv_dma_buf;
@@ -160,9 +160,7 @@ void rf_spi_master_task(void *arg)
         if (event.data == NULL || event.len <= 0) {
             continue;
         }
-        for (x = 0; x < event.len; x++) {
-            rf_spi_master_obj->send_dma_buf[x] = event.data[x];
-        }
+        memcpy(rf_spi_master_obj->send_dma_buf, event.data, event.len);
         memset(rf_spi_master_obj->recv_dma_buf, 0, rf_spi_master_obj->trans_max_len);
         t.length = event.len * 8;
         ret = spi_device_transmit(handle, &t);
@@ -185,19 +183,25 @@ int rf_spi_master_deinit()
 
 int rf_spi_master_init(rf_spi_master_config_t *config)
 {
-    if (config->trans_max_len <= 0) {
-        printf("argc error: %s, %d\n", __func__, __LINE__);
-        return -1;
-    }
+    int ret = 0;
+    assert(config != NULL);
+    assert(config->trans_max_len > 0);
+    
     rf_spi_master_obj = (rf_spi_master_obj_t *)heap_caps_calloc(1, sizeof(rf_spi_master_obj_t), MALLOC_CAP_8BIT);
+    assert(rf_spi_master_obj != NULL);
     rf_spi_master_obj->trans_max_len = config->trans_max_len;
     rf_spi_master_obj->trans_start_cb = config->trans_start_cb;
     rf_spi_master_obj->trans_done_cb = config->trans_done_cb;
     rf_spi_master_obj->send_queue = xQueueCreate(1, sizeof(rf_spi_master_event_t));
     rf_spi_master_obj->recv_queue = xQueueCreate(1, sizeof(rf_spi_master_event_t));
-    rf_spi_master_obj->send_dma_buf = (uint8_t *)heap_caps_malloc(sizeof(uint8_t)*rf_spi_master_obj->trans_max_len, MALLOC_CAP_DMA);
-    rf_spi_master_obj->recv_dma_buf = (uint8_t *)heap_caps_malloc(sizeof(uint8_t)*rf_spi_master_obj->trans_max_len, MALLOC_CAP_DMA);
+    rf_spi_master_obj->send_dma_buf = (void *)heap_caps_malloc(rf_spi_master_obj->trans_max_len, MALLOC_CAP_DMA);
+    rf_spi_master_obj->recv_dma_buf = (void *)heap_caps_malloc(rf_spi_master_obj->trans_max_len, MALLOC_CAP_DMA);
+    assert(rf_spi_master_obj->send_queue != NULL);
+    assert(rf_spi_master_obj->recv_queue != NULL);
+    assert(rf_spi_master_obj->send_dma_buf != NULL);
+    assert(rf_spi_master_obj->recv_dma_buf != NULL);
 
-    xTaskCreate(rf_spi_master_task, "rf_spi_master_task", 1024 * 4, NULL, 5, NULL);
+    ret = xTaskCreate(rf_spi_master_task, "rf_spi_master_task", 1024 * 4, NULL, 5, NULL);
+    assert(ret == pdTRUE);
     return 0;
 }
