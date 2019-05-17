@@ -308,7 +308,7 @@ void dsp_task(void *arg)
     vTaskSuspend(NULL);
 }
 
-#define LCD_BURST_MAX_LEN (LV_HOR_RES * 4)  // // Maximum pixel data transferred at a time
+#define LCD_BURST_MAX_LEN (LV_HOR_RES * 16)  // // Maximum pixel data transferred at a time
 
 void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
 {
@@ -343,6 +343,8 @@ int main()
     xSemaphoreTake(matrix_sem, 0);
     dsp_sem = xSemaphoreCreateBinary();
     xSemaphoreTake(dsp_sem, 0);
+
+    lv_init();
 
     xTaskCreate(fft_task, "fft_task", 2560 * 1, NULL, 5, NULL);
     xTaskCreate(matrix_task, "matrix_task", 512 * 1, NULL, 5, NULL);

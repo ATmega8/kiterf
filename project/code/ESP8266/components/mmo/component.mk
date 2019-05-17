@@ -1,0 +1,3 @@
+COMPONENT_ADD_INCLUDEDIRS := include test
+COMPONENT_PRIV_INCLUDEDIRS := include test 
+COMPONENT_SRCDIRS := . test 

@@ -19,7 +19,7 @@ extern "C" {
 #define LCD_HOR_WIDTH (320)
 #define LCD_VER_WIDTH (240)
 
-#define LCD_BURST_MAX_LEN (LCD_HOR_WIDTH * 4)  // Maximum pixel data transferred at a time
+#define LCD_BURST_MAX_LEN (LCD_HOR_WIDTH * 16)  // Maximum pixel data transferred at a time
 
 void inline lcd_set_res(uint8_t state)
 {

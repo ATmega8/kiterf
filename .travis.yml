@@ -19,6 +19,7 @@ cache:
 - directories:
   - tools/K210/kendryte-toolchain
   - tools/ESP32/xtensa-esp32-elf
+  - tools/ESP8266/xtensa-lx106-elf
   - tools/cmake-3.14.2
 before_install:
 - openssl aes-256-cbc -K $encrypted_0e2adedb83b2_key -iv $encrypted_0e2adedb83b2_iv
@@ -54,9 +55,17 @@ install:
   else
     echo "ESP32 toolchain is already download in cache"
   fi
+- |
+  if [ ! -d "tools/ESP8266/xtensa-lx106-elf/bin" ]; then
+    echo "Download ESP8266 toolchain ..."
+    wget https://$HOST/download/xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+    tar zxvf xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz -C tools/ESP8266/
+  else
+    echo "ESP8266 toolchain is already download in cache"
+  fi
 before_script:
 - cd $TRAVIS_BUILD_DIR
-- . add_path.sh
+- . add_path.sh 0
 - python -m pip install --user -r $TRAVIS_BUILD_DIR/tools/ESP32/esp-idf/requirements.txt
 - cmake --version
 script:
@@ -64,6 +73,11 @@ script:
 - ./build.sh
 - cd $TRAVIS_BUILD_DIR/project/code/ESP32
 - idf.py build
+- make defconfig
+- make -j
+- cd $TRAVIS_BUILD_DIR
+- . add_path.sh 1
+- cd $TRAVIS_BUILD_DIR/project/code/ESP8266
 - make defconfig
 - make -j
 after_success:

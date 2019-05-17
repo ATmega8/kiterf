@@ -83,26 +83,31 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     ```
     ├── add_path.sh
     ├── data
+    │   ├── kendryte_datasheet.pdf
+    │   ├── kendryte_freertos_programming_guide.pdf
     │   ├── kiterf_1.0.0.jpg
     │   ├── kiterf_structure.pos
     │   └── kiterf_structure.svg
     ├── docs
-    │   ├── kendryte_datasheet.pdf
-    │   └── kendryte_freertos_programming_guide.pdf
+    │   └── Doxyfile
     ├── LICENSE
     ├── project
     │   ├── code
     │   │   ├── ESP32
+    │   │   ├── ESP8266
     │   │   └── K210
     │   └── pcb
-    │       ├── ESP32
     │       ├── K210
     │       └── RF
     ├── README.md
     └── tools
+        ├── cmake-3.14.2
         ├── ESP32
         │   ├── esp-idf
         │   └── xtensa-esp32-elf
+        ├── ESP8266
+        │   ├── ESP8266_RTOS_SDK
+        │   └── xtensa-lx106-elf
         └── K210
             ├── kendryte-freertos-sdk
             ├── kendryte-toolchain
@@ -138,6 +143,8 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
       * toolchain
 
 ## How to use
+
+You can follow the steps below to set up the development environment, or directly download the release version of the full environment.
 
 * clone
 
@@ -196,6 +203,18 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
       rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
       ```
 
+  * ESP8266
+
+    KiteRF also integrates the ESP8266 development environment, which is not necessary, and you can choose to ignore it.
+
+    * Ubuntu/Debian/Kali/Arch
+
+      ```bash
+      wget https://www.kiterf.xyz/download/xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+      tar zxvf xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz -C tools/ESP8266/
+      rm xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+      ```
+
   * CMake
 
     * Ubuntu/Debian/Kali/Arch
@@ -210,6 +229,25 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
       cd $KITERF_PATH
       rm cmake-3.14.2.tar.gz
       ```
+
+## Release
+
+* download
+
+  ```bash
+  wget https://www.kiterf.xyz/download/kiterf-debain-amd64-1.2.0-20190517.tar.gz
+  tar zxvf kiterf-debain-amd64-1.2.0-20190517.tar.gz
+  rm kiterf-debain-amd64-1.2.0-20190517.tar.gz
+  cd kiterf
+  ```
+* Add environment variables
+
+  ```bash
+  . add_path.sh
+  ```
+  * note
+
+    Don't forget `"."`
 
 ## License
 
