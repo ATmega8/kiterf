@@ -17,10 +17,10 @@ else
     read input
 fi
 
-if [ $input == 1 ]; then
+if [ "$input" == 1 ]; then
     export IDF_PATH=$TOOL_PATH/ESP8266/ESP8266_RTOS_SDK
     echo "Register ESP8266 IDF PATH"
-else
+else 
     export IDF_PATH=$TOOL_PATH/ESP32/esp-idf
     echo "Register ESP32 IDF PATH"
 fi
