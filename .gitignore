@@ -41,4 +41,5 @@ docs/doxygen_sqlite3.db
 # Tool chain
 *kendryte-toolchain
 *xtensa-esp32-elf
+*xtensa-lx106-elf
 *cmake-3.14.2

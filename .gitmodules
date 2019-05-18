@@ -13,3 +13,9 @@
 [submodule "project/code/K210/components/littlevgl/lvgl"]
 	path = project/code/K210/components/littlevgl/lvgl
 	url = https://github.com/littlevgl/lvgl
+[submodule "tools/ESP8266/ESP8266_RTOS_SDK"]
+	path = tools/ESP8266/ESP8266_RTOS_SDK
+	url = https://github.com/espressif/ESP8266_RTOS_SDK.git
+[submodule "project/code/ESP8266/components/littlevgl/lvgl"]
+	path = project/code/ESP8266/components/littlevgl/lvgl
+	url = https://github.com/littlevgl/lvgl
