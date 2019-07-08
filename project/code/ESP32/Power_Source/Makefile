@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := kiterf
+PROJECT_NAME := Power_Source
 
 include $(IDF_PATH)/make/project.mk
 
