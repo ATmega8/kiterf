@@ -24,3 +24,8 @@
   ```bash
   idf.py flash monitor
   ```
+
+  ```bash
+  python spiffsgen.py 0x1f0000 spiffs spiffs.bin
+  esptool.py -p /dev/ttyUSB0 -b 460800 --after hard_reset write_flash --flash_mode dio --flash_size detect --flash_freq 40m 0x210000 spiffs.bin
+  ```
