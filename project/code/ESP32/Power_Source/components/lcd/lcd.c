@@ -12,7 +12,7 @@ static SemaphoreHandle_t lcd_write_mux = NULL;
 static uint8_t lcd_dc_state = 0;
 static uint8_t lcd_num = 0;
 
-#define SPI_BURST_MAX_LEN (240*240*2)  // Maximum pixel data transferred at a time
+#define SPI_BURST_MAX_LEN (240 * 240 * 2)  // Maximum pixel data transferred at a time
 
 static void IRAM_ATTR spi_pre_transfer_callback(spi_transaction_t *t)
 {

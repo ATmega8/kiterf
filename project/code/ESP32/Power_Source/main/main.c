@@ -12,9 +12,9 @@
 #include "dsp_math.h"
 #include "lvgl.h"
 #include "lcd.h"
+#include "gui.h"
 
-static lv_disp_t  * disp1;
-static lv_disp_t  * disp2;
+lv_disp_t *disp[2];
 
 void IRAM_ATTR disp_flush1(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
@@ -65,14 +65,14 @@ void gui_task(void *arg)
 {
     lcd_init();
 
-    xTaskCreate(gui_tick_task, "gui_tick_task", 512, NULL, 10, NULL);
+    xTaskCreate(gui_tick_task, "gui_tick_task", 512, NULL, 5, NULL);
 
     lv_init();
 
     /*Create a display buffer*/
     static lv_disp_buf_t disp_buf1;
     static lv_color_t *buf1_1 = NULL;
-    buf1_1 = (lv_color_t *)heap_caps_malloc(240 * 240, MALLOC_CAP_DMA);
+    buf1_1 = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * (240 * 240), MALLOC_CAP_DMA);
     lv_disp_buf_init(&disp_buf1, buf1_1, NULL, 240 * 240);
 
     /*Create a display*/
@@ -80,12 +80,12 @@ void gui_task(void *arg)
     lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
     disp_drv.buffer = &disp_buf1;
     disp_drv.flush_cb = disp_flush1;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
-    disp1 = lv_disp_drv_register(&disp_drv);
+    disp[0] = lv_disp_drv_register(&disp_drv);
 
     /*Create an other buffer for double buffering*/
     static lv_disp_buf_t disp_buf2;
     static lv_color_t *buf2_1 = NULL;
-    buf2_1 = (lv_color_t *)heap_caps_malloc(160 * 80, MALLOC_CAP_DMA);
+    buf2_1 = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * (160 * 80), MALLOC_CAP_DMA);
     lv_disp_buf_init(&disp_buf2, buf2_1, NULL, 160 * 80);
 
     /*Create an other display*/
@@ -94,73 +94,13 @@ void gui_task(void *arg)
     disp_drv.flush_cb = disp_flush2;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
     disp_drv.hor_res = 160;
     disp_drv.ver_res = 80;
-    disp2 = lv_disp_drv_register(&disp_drv);
+    disp[1] = lv_disp_drv_register(&disp_drv);
+
+    lv_disp_set_default(disp[0]);
 
     lv_task_create(memory_monitor, 3000, LV_TASK_PRIO_MID, NULL);
 
-    // lv_disp_set_default(disp1);
-
-    lv_obj_t  * calendar = lv_calendar_create(lv_disp_get_scr_act(disp1), NULL);
-    lv_obj_set_size(calendar, 240, 240);
-    lv_obj_set_pos(calendar, 0, 0);
-    // lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
-    // lv_obj_set_event_cb(calendar, event_handler);
-
-    /*Set the today*/
-    lv_calendar_date_t today;
-    today.year = 2018;
-    today.month = 10;
-    today.day = 23;
-
-    lv_calendar_set_today_date(calendar, &today);
-    lv_calendar_set_showed_date(calendar, &today);
-
-    /*Highlight some days*/
-    static lv_calendar_date_t highlihted_days[3];       /*Only it's pointer will be saved so should be static*/
-    highlihted_days[0].year = 2018;
-    highlihted_days[0].month = 10;
-    highlihted_days[0].day = 6;
-
-    highlihted_days[1].year = 2018;
-    highlihted_days[1].month = 10;
-    highlihted_days[1].day = 11;
-
-    highlihted_days[2].year = 2018;
-    highlihted_days[2].month = 11;
-    highlihted_days[2].day = 22;
-
-    lv_calendar_set_highlighted_dates(calendar, highlihted_days, 3);
-
-    // lv_disp_set_default(disp2);
-
-    calendar = lv_calendar_create(lv_disp_get_scr_act(disp2), NULL);
-    lv_obj_set_size(calendar, 160, 80);
-    lv_obj_set_pos(calendar, 0, 0);
-    // lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
-    // lv_obj_set_event_cb(calendar, event_handler);
-
-    today.year = 2018;
-    today.month = 10;
-    today.day = 23;
-
-    lv_calendar_set_today_date(calendar, &today);
-    lv_calendar_set_showed_date(calendar, &today);
-
-    highlihted_days[0].year = 2018;
-    highlihted_days[0].month = 10;
-    highlihted_days[0].day = 6;
-
-    highlihted_days[1].year = 2018;
-    highlihted_days[1].month = 10;
-    highlihted_days[1].day = 11;
-
-    highlihted_days[2].year = 2018;
-    highlihted_days[2].month = 11;
-    highlihted_days[2].day = 22;
-
-    lv_calendar_set_highlighted_dates(calendar, highlihted_days, 3);
-
-    // gui_init(lv_theme_material_init(0, NULL));
+    gui_init(disp, lv_theme_material_init(0, NULL));
 
     while(1) {
         lv_task_handler();
