@@ -23,6 +23,7 @@
 #include "lvgl.h"
 #include "lcd.h"
 #include "gui.h"
+#include "encoder.h"
 
 #define WIFI_SSID      CONFIG_WIFI_SSID
 #define WIFI_PASS      CONFIG_WIFI_PASSWORD
@@ -37,8 +38,9 @@ const int WIFI_CONNECTED_BIT = BIT0;
 static const char *TAG = "Power Source";
 
 static lv_disp_t *disp[2];
+static lv_indev_t *indev[1];
 
-static void IRAM_ATTR disp_flush1(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+static void IRAM_ATTR lv_disp_flush1(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     uint32_t len = (sizeof(uint16_t) * ((area->y2 - area->y1 + 1)*(area->x2 - area->x1 + 1)));
 
@@ -49,7 +51,7 @@ static void IRAM_ATTR disp_flush1(lv_disp_drv_t * disp_drv, const lv_area_t * ar
     lv_disp_flush_ready(disp_drv);
 }
 
-static void IRAM_ATTR disp_flush2(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+static void IRAM_ATTR lv_disp_flush2(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     uint32_t len = (sizeof(uint16_t) * ((area->y2 - area->y1 + 1)*(area->x2 - area->x1 + 1)));
 
@@ -60,7 +62,19 @@ static void IRAM_ATTR disp_flush2(lv_disp_drv_t * disp_drv, const lv_area_t * ar
     lv_disp_flush_ready(disp_drv);
 }
 
-static void memory_monitor(lv_task_t * param)
+bool lv_encoder_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
+{
+  data->enc_diff = encoder_get_new_moves();
+  if(encoder_get_button_state()) {
+      data->state = LV_INDEV_STATE_PR;
+  } else {
+      data->state = LV_INDEV_STATE_REL;
+  }
+  
+  return false; /*No buffering now so no more data read*/
+}
+
+static void lv_memory_monitor(lv_task_t * param)
 {
     (void) param; /*Unused*/
 
@@ -73,7 +87,7 @@ static void memory_monitor(lv_task_t * param)
            esp_get_free_heap_size());
 }
 
-static void gui_tick_task(void * arg)
+static void lv_tick_task(void * arg)
 {
     while(1) {
         lv_tick_inc(10);
@@ -83,9 +97,10 @@ static void gui_tick_task(void * arg)
 
 static void gui_task(void *arg)
 {
+    encoder_init();
     lcd_init();
-
-    xTaskCreate(gui_tick_task, "gui_tick_task", 1024, NULL, 5, NULL);
+    
+    xTaskCreate(lv_tick_task, "lv_tick_task", 1024, NULL, 5, NULL);
 
     lv_init();
 
@@ -99,7 +114,7 @@ static void gui_task(void *arg)
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
     disp_drv.buffer = &disp_buf1;
-    disp_drv.flush_cb = disp_flush1;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
+    disp_drv.flush_cb = lv_disp_flush1;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
     disp[0] = lv_disp_drv_register(&disp_drv);
 
     /*Create an other buffer for double buffering*/
@@ -111,16 +126,23 @@ static void gui_task(void *arg)
     /*Create an other display*/
     lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
     disp_drv.buffer = &disp_buf2;
-    disp_drv.flush_cb = disp_flush2;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
+    disp_drv.flush_cb = lv_disp_flush2;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
     disp_drv.hor_res = 160;
     disp_drv.ver_res = 80;
     disp[1] = lv_disp_drv_register(&disp_drv);
 
+    lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);      /*Basic initialization*/
+    indev_drv.type = LV_INDEV_TYPE_ENCODER;
+    indev_drv.read_cb = lv_encoder_read;
+    /*Register the driver in LittlevGL and save the created input device object*/
+    indev[0] = lv_indev_drv_register(&indev_drv);
+
     lv_disp_set_default(disp[0]);
 
-    lv_task_create(memory_monitor, 3000, LV_TASK_PRIO_MID, NULL);
+    lv_task_create(lv_memory_monitor, 3000, LV_TASK_PRIO_MID, NULL);
 
-    gui_init(disp, lv_theme_material_init(0, NULL));
+    gui_init(disp, indev, lv_theme_material_init(0, NULL));
 
     while(1) {
         lv_task_handler();

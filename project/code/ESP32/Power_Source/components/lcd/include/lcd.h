@@ -15,7 +15,7 @@ extern "C" {
 #define LCD_PIN_CS0  21
 #define LCD_PIN_CS1  22
 
-#define LCD_PIN_BCKL 5
+#define LCD_PIN_BCKL 26
 
 void inline lcd_set_res(uint8_t state)
 {

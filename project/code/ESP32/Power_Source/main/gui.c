@@ -33,6 +33,7 @@ source_t source[3] = {0};
 static QueueHandle_t gui_event_queue = NULL;
 
 static lv_disp_t **disp;
+static lv_indev_t **indev;
 
 static void header_create(void)
 {
@@ -301,9 +302,12 @@ int gui_set_source_value(char type, float value, uint8_t color_mask, int ticks_w
     return ret;
 }
 
-void gui_init(lv_disp_t **disp_array, lv_theme_t * th)
+static lv_group_t * encoder_group;
+
+void gui_init(lv_disp_t **disp_array, lv_indev_t **indev_array, lv_theme_t * th)
 {
     disp = disp_array;
+    indev = indev_array;
     gui_event_queue = xQueueCreate(5, sizeof(gui_event_t));
     lv_theme_set_current(th);
     th = lv_theme_get_current();    /*If `LV_THEME_LIVE_UPDATE  1` `th` is not used directly so get the real theme after set*/
@@ -318,19 +322,14 @@ void gui_init(lv_disp_t **disp_array, lv_theme_t * th)
     gui_set_source_value('A', 0, 16, portMAX_DELAY);
     gui_set_source_value('W', 0, 16, portMAX_DELAY);
 
-    /*Create a style for the Preloader*/
-    static lv_style_t style;
-    lv_style_copy(&style, &lv_style_plain);
-    style.line.width = 10;                         /*10 px thick arc*/
-    style.line.color = lv_color_hex3(0x258);       /*Blueish arc color*/
-
-    style.body.border.color = lv_color_hex3(0xBBB); /*Gray background color*/
-    style.body.border.width = 10;
-    style.body.padding.left = 0;
-
-    /*Create a Preloader object*/
-    lv_obj_t * preload = lv_preload_create(lv_disp_get_scr_act(disp[1]), NULL);
-    lv_obj_set_size(preload, 60, 60);
-    lv_obj_align(preload, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_preload_set_style(preload, LV_PRELOAD_STYLE_MAIN, &style);
+    encoder_group = lv_group_create();
+    // lv_group_set_focus_cb(encoder_group, group_focus_cb);
+    lv_indev_set_group(indev[0], encoder_group);
+    lv_obj_t * spinbox = lv_spinbox_create(lv_disp_get_scr_act(disp[1]), NULL);
+    // lv_obj_set_event_cb(obj, general_event_handler);
+    lv_spinbox_set_digit_format(spinbox, 5, 2);
+    lv_spinbox_step_prev(spinbox);
+    lv_obj_set_width(spinbox, 160);
+    lv_obj_align(spinbox, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_group_add_obj(encoder_group, spinbox);
 }

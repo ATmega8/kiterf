@@ -315,7 +315,7 @@ void lcd_init()
     gpio_set_direction(LCD_PIN_RST, GPIO_MODE_OUTPUT);
     gpio_set_direction(LCD_PIN_CS0, GPIO_MODE_OUTPUT);
     gpio_set_direction(LCD_PIN_CS1, GPIO_MODE_OUTPUT);
-    gpio_set_direction(LCD_PIN_BCKL, GPIO_MODE_OUTPUT);
+    // gpio_set_direction(LCD_PIN_BCKL, GPIO_MODE_OUTPUT);
     lcd_set_cs0(1);
     lcd_set_cs1(1);
     
