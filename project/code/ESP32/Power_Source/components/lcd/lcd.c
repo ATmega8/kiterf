@@ -108,83 +108,82 @@ void lcd_rst()
 static void lcd_st7789_config()
 {
     lcd_select(0);
-    // lcd_delay_ms (120);
-    lcd_write_cmd(0x36);    // MADCTL (36h): Memory Data Access Control .
+
+    lcd_write_cmd(0x36); // MADCTL (36h): Memory Data Access Control
     lcd_write_byte(0x00);
 
-    lcd_write_cmd(0x3A);    // COLMOD (3Ah): Interface Pixel Format 
+    lcd_write_cmd(0x3A);  // COLMOD (3Ah): Interface Pixel Format 
     lcd_write_byte(0x05);
 
-    lcd_write_cmd(0xB2);    // PORCTRL (B2h): Porch Setting 
+    lcd_write_cmd(0xB2); // PORCTRL (B2h): Porch Setting 
     lcd_write_byte(0x0C);
     lcd_write_byte(0x0C);
     lcd_write_byte(0x00);
     lcd_write_byte(0x33);
-    lcd_write_byte(0x33);
+    lcd_write_byte(0x33); 
 
-    lcd_write_cmd(0xB7);    // GCTRL (B7h): Gate Control 
+    lcd_write_cmd(0xB7); // GCTRL (B7h): Gate Control 
     lcd_write_byte(0x35);  
 
-    lcd_write_cmd(0xBB);    // VCOMS (BBh): VCOM Setting 
-    lcd_write_byte(0x37);   // 1.415
+    lcd_write_cmd(0xBB); // VCOMS (BBh): VCOM Setting 
+    lcd_write_byte(0x19);
 
-    lcd_write_cmd(0xC0);    // LCMCTRL (C0h): LCM Control 
+    lcd_write_cmd(0xC0); // LCMCTRL (C0h): LCM Control 
     lcd_write_byte(0x2C);
 
-    lcd_write_cmd(0xC2);    // VDVVRHEN (C2h): VDV and VRH Command Enable 
+    lcd_write_cmd(0xC2); // VDVVRHEN (C2h): VDV and VRH Command Enable
     lcd_write_byte(0x01);
 
-    lcd_write_cmd(0xC3);    // VRHS (C3h): VRH Set 
+    lcd_write_cmd(0xC3); // VRHS (C3h): VRH Set
     lcd_write_byte(0x12);   
 
-    lcd_write_cmd(0xC4);    // VDVS (C4h): VDV Set 
+    lcd_write_cmd(0xC4); // VDVS (C4h): VDV Set 
     lcd_write_byte(0x20);  
 
-    lcd_write_cmd(0xC6);    // FRCTRL2 (C6h): Frame Rate Control in Normal Mode 
+    lcd_write_cmd(0xC6); // FRCTRL2 (C6h): Frame Rate Control in Normal Mode 
     lcd_write_byte(0x0F);    
 
-    lcd_write_cmd(0xD0);    // PWCTRL1 (D0h): Power Control 1 
+    lcd_write_cmd(0xD0); // PWCTRL1 (D0h): Power Control 1 
     lcd_write_byte(0xA4);
     lcd_write_byte(0xA1);
 
-    // lcd_write_cmd(0xE0);    // PVGAMCTRL (E0h): Positive Voltage Gamma Control 
-    // lcd_write_byte(0xD0);
-    // lcd_write_byte(0x04);
-    // lcd_write_byte(0x0D);
-    // lcd_write_byte(0x11);
-    // lcd_write_byte(0x13);
-    // lcd_write_byte(0x2B);
-    // lcd_write_byte(0x3F);
-    // lcd_write_byte(0x54);
-    // lcd_write_byte(0x4C);
-    // lcd_write_byte(0x18);
-    // lcd_write_byte(0x0D);
-    // lcd_write_byte(0x0B);
-    // lcd_write_byte(0x1F);
-    // lcd_write_byte(0x23);
+    lcd_write_cmd(0xE0); // PVGAMCTRL (E0h): Positive Voltage Gamma Control
+    lcd_write_byte(0xD0);
+    lcd_write_byte(0x04);
+    lcd_write_byte(0x0D);
+    lcd_write_byte(0x11);
+    lcd_write_byte(0x13);
+    lcd_write_byte(0x2B);
+    lcd_write_byte(0x3F);
+    lcd_write_byte(0x54);
+    lcd_write_byte(0x4C);
+    lcd_write_byte(0x18);
+    lcd_write_byte(0x0D);
+    lcd_write_byte(0x0B);
+    lcd_write_byte(0x1F);
+    lcd_write_byte(0x23);
 
-    // lcd_write_cmd(0xE1);    // NVGAMCTRL (E1h): Negative Voltage Gamma Control
-    // lcd_write_byte(0xD0);
-    // lcd_write_byte(0x04);
-    // lcd_write_byte(0x0C);
-    // lcd_write_byte(0x11);
-    // lcd_write_byte(0x13);
-    // lcd_write_byte(0x2C);
-    // lcd_write_byte(0x3F);
-    // lcd_write_byte(0x44);
-    // lcd_write_byte(0x51);
-    // lcd_write_byte(0x2F);
-    // lcd_write_byte(0x1F);
-    // lcd_write_byte(0x1F);
-    // lcd_write_byte(0x20);
-    // lcd_write_byte(0x23);
+    lcd_write_cmd(0xE1); // NVGAMCTRL (E1h): Negative Voltage Gamma Control
+    lcd_write_byte(0xD0);
+    lcd_write_byte(0x04);
+    lcd_write_byte(0x0C);
+    lcd_write_byte(0x11);
+    lcd_write_byte(0x13);
+    lcd_write_byte(0x2C);
+    lcd_write_byte(0x3F);
+    lcd_write_byte(0x44);
+    lcd_write_byte(0x51);
+    lcd_write_byte(0x2F);
+    lcd_write_byte(0x1F);
+    lcd_write_byte(0x1F);
+    lcd_write_byte(0x20);
+    lcd_write_byte(0x23);
 
-    lcd_write_cmd(0x21);    // INVON (21h): Display Inversion On 
+    lcd_write_cmd(0x21); // INVON (21h): Display Inversion On
 
-    lcd_write_cmd(0x11);    // SLPOUT (11h): Sleep Out 
+    lcd_write_cmd(0x11); // SLPOUT (11h): Sleep Out 
 
-
-    lcd_write_cmd(0x29);    // DISPON (29h): Display On
+    lcd_write_cmd(0x29); // DISPON (29h): Display On
 }
 
 static void lcd_st7735_config()

@@ -24,6 +24,8 @@
 #include "lcd.h"
 #include "gui.h"
 #include "encoder.h"
+#include "i2c_bus.h"
+#include "INA219.h"
 
 #define WIFI_SSID      CONFIG_WIFI_SSID
 #define WIFI_PASS      CONFIG_WIFI_PASSWORD
@@ -448,17 +450,16 @@ static void sensor_task(void *arg)
 
     time_t now;
     struct tm timeinfo, last_timeinfo;
+    ina219_info_t ina219;
 
     while (1) {
-        // adc_read(&adc_data);
+        INA219_get_all(&ina219);
         // update 'now' variable with current time
         time(&now);
         localtime_r(&now, &timeinfo);
-        // if (adc_data != last_adc_data) {
-        //     gui_set_source_value('V', 10 * adc_data * (1 / 1024.0), 1, portMAX_DELAY);
-        //     gui_set_source_value('A', adc_data * (1 / 1024.0), 2, portMAX_DELAY);
-        //     gui_set_source_value('W', 10 * adc_data * (1 / 1024.0) * adc_data * (1 / 1024.0), 0xff, portMAX_DELAY);
-        // }
+        gui_set_source_value('V', ina219.voltage_bus_v, 0, portMAX_DELAY);
+        gui_set_source_value('A', ina219.current_ma, 0, portMAX_DELAY);
+        gui_set_source_value('W', ina219.power_mw, 0, portMAX_DELAY);
         if (timeinfo.tm_year < (2016 - 1900)) {
             // ESP_LOGE(TAG, "The current date/time error");
         } else {
@@ -468,7 +469,7 @@ static void sensor_task(void *arg)
         }
         // last_adc_data = adc_data;
         last_timeinfo = timeinfo;
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(500 / portTICK_RATE_MS);
     }
 }
 
@@ -544,8 +545,11 @@ void app_main()
     setenv("TZ", "CST-8", 1);
     tzset();
 
+    i2c_bus_init();
+    INA219_init(INA219_ADDRESS);
+
     xTaskCreate(gui_task, "gui_task", 4096, NULL, 5, NULL);
-    xTaskCreate(sensor_task, "sensor_task", 1024, NULL, 5, NULL);
+    xTaskCreate(sensor_task, "sensor_task", 2048, NULL, 5, NULL);
 
     vTaskDelay(2000 / portTICK_RATE_MS);
 
