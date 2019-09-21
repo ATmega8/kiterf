@@ -69,15 +69,15 @@ before_script:
 - python -m pip install --user -r $TRAVIS_BUILD_DIR/tools/ESP32/esp-idf/requirements.txt
 - cmake --version
 script:
-- cd $TRAVIS_BUILD_DIR/project/code/K210
+- cd $TRAVIS_BUILD_DIR/project/code/K210/Demo
 - ./build.sh
-- cd $TRAVIS_BUILD_DIR/project/code/ESP32
+- cd $TRAVIS_BUILD_DIR/project/code/ESP32/Demo
 - idf.py build
 - make defconfig
 - make -j
 - cd $TRAVIS_BUILD_DIR
 - . add_path.sh 1
-- cd $TRAVIS_BUILD_DIR/project/code/ESP8266
+- cd $TRAVIS_BUILD_DIR/project/code/ESP8266/Demo
 - make defconfig
 - make -j
 after_success:
