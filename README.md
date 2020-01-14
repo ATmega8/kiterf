@@ -198,9 +198,8 @@ You can follow the steps below to set up the development environment, or directl
     * Ubuntu/Debian/Kali/Arch
 
       ```bash
-      wget https://www.kiterf.xyz/download/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
-      tar zxvf xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz -C tools/ESP32/
-      rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+      cd tools/ESP32/esp-idf
+      ./install.sh
       ```
 
   * ESP8266
