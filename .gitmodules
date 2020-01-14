@@ -19,3 +19,6 @@
 [submodule "tools/ESP32/esp-idf"]
 	path = tools/ESP32/esp-idf
 	url = https://github.com/espressif/esp-idf
+[submodule "project/code/ESP32/Demo/components/esp_lua"]
+	path = project/code/ESP32/Demo/components/esp_lua
+	url = https://github.com/xiongyumail/esp_lua.git

@@ -40,7 +40,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
 
       * RGB LED Control
 
-  * RF (Radio Freqency) unit
+  * RF (Radio Frequency) unit
 
     * ADC (Analog-to-Digital Converter)
     
@@ -54,7 +54,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
 
       * Mixing IF signal to baseband and outputting IQ analog signal
 
-    * VCO (Voltage-Controlled oscillator)
+    * VCO (Voltage-Controlled Oscillator)
 
       * Provide local IF frequency
 
@@ -70,7 +70,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
 
       * Switching signal paths in different frequencies
 
-* KiteRF coreborad v1.0.0
+* KiteRF core-board v1.0.0
 
   ![KiteRF](data/kiterf_1.0.0.jpg)
 
@@ -125,7 +125,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
 
     * release
 
-      * PCB gerber
+      * PCB Gerber
 
       * FPGA bin
 
@@ -137,7 +137,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
 
       * script
 
-      * sdk
+      * SDK
 
       * toolchain
 
@@ -199,6 +199,7 @@ You can follow the steps below to set up the development environment, or directl
       ```bash
       cd tools/ESP32/esp-idf
       ./install.sh
+      cd $KITERF_PATH
       ```
 
   * ESP8266
