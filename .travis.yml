@@ -18,7 +18,6 @@ cache:
 - pip
 - directories:
   - tools/K210/kendryte-toolchain
-  - tools/ESP32/xtensa-esp32-elf
   - ~/.espressif
   - tools/ESP8266/xtensa-lx106-elf
   - tools/cmake-3.14.2

@@ -16,9 +16,6 @@
 [submodule "project/code/ESP8266/components/littlevgl/lvgl"]
 	path = project/code/ESP8266/Demo/components/littlevgl/lvgl
 	url = https://github.com/littlevgl/lvgl
-[submodule "project/code/ESP32/Power_Source/components/littlevgl/lvgl"]
-	path = project/code/ESP32/Power_Source/components/littlevgl/lvgl
-	url = https://github.com/littlevgl/lvgl.git
 [submodule "tools/ESP32/esp-idf"]
 	path = tools/ESP32/esp-idf
 	url = https://github.com/espressif/esp-idf

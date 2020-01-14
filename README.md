@@ -103,8 +103,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     └── tools
         ├── cmake-3.14.2
         ├── ESP32
-        │   ├── esp-idf
-        │   └── xtensa-esp32-elf
+        │   └── esp-idf
         ├── ESP8266
         │   ├── ESP8266_RTOS_SDK
         │   └── xtensa-lx106-elf
