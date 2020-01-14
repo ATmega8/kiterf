@@ -7,7 +7,7 @@ export K210_TOOLCHAIN_PATH=$TOOL_PATH/K210/kendryte-toolchain/bin
 export K210_SDK_PATH=$TOOL_PATH/K210/kendryte-freertos-sdk
 export K210_KFLASH_PATH=$TOOL_PATH/K210/kflash 
 export LD_LIBRARY_PATH=$K210_TOOLCHAIN_PATH:$LD_LIBRARY_PATH
-export PATH=$TOOL_PATH/ESP32/xtensa-esp32-elf/bin:$TOOL_PATH/ESP32/esp-idf/tools:$TOOL_PATH/ESP8266/xtensa-lx106-elf/bin:$PATH
+export PATH=$TOOL_PATH/ESP8266/xtensa-lx106-elf/bin:$PATH
 IDF=$1
 if [  -n "$IDF" ] ;then
     input=$IDF
@@ -21,7 +21,7 @@ if [ "$input" == 1 ]; then
     export IDF_PATH=$TOOL_PATH/ESP8266/ESP8266_RTOS_SDK
     echo "Register ESP8266 IDF PATH"
 else 
-    export IDF_PATH=$TOOL_PATH/ESP32/esp-idf
+    . $TOOL_PATH/ESP32/esp-idf/export.sh
     echo "Register ESP32 IDF PATH"
 fi
 export PATH=$KITERF_PATH/tools/cmake-3.14.2/bin:$PATH

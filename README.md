@@ -103,8 +103,7 @@ _KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which m
     └── tools
         ├── cmake-3.14.2
         ├── ESP32
-        │   ├── esp-idf
-        │   └── xtensa-esp32-elf
+        │   └── esp-idf
         ├── ESP8266
         │   ├── ESP8266_RTOS_SDK
         │   └── xtensa-lx106-elf
@@ -198,9 +197,8 @@ You can follow the steps below to set up the development environment, or directl
     * Ubuntu/Debian/Kali/Arch
 
       ```bash
-      wget https://www.kiterf.xyz/download/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
-      tar zxvf xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz -C tools/ESP32/
-      rm xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+      cd tools/ESP32/esp-idf
+      ./install.sh
       ```
 
   * ESP8266
