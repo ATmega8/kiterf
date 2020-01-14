@@ -15,6 +15,7 @@
 #include "dsp_math.h"
 #include "lvgl.h"
 #include "lcd.h"
+#include "esp_lua.h"
 
 #define FFT_N               512U
 #define FFT_FORWARD_SHIFT   0x0U
@@ -335,6 +336,14 @@ void app_main()
     xTaskCreate(matrix_task, "matrix_task", 512 * 4, NULL, 5, NULL);
     xTaskCreate(dsp_task, "dsp_task", 1024 * 4, NULL, 5, NULL);
     xTaskCreate(lvgl_task, "lvgl_task", 1024 * 4, NULL, 5, NULL);
+
+    vTaskDelay(5000 / portTICK_RATE_MS);
+
+    const char *ESP_LUA_ARGV[2] = {"./lua", NULL};
+    esp_lua_init(NULL, NULL, NULL);
+    while (1) {
+        esp_lua_main(1, ESP_LUA_ARGV);
+    }
 
     vTaskSuspend(NULL);
 }
