@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#define LCD_HX8357
+
 #define LCD_PIN_MISO 25
 #define LCD_PIN_MOSI 23
 #define LCD_PIN_CLK  19
@@ -33,7 +35,11 @@ void inline lcd_set_dc(uint8_t state)
 
 void inline lcd_set_blk(uint8_t state)
 {
+#if defined(LCD_HX8357)
+    gpio_set_level(LCD_PIN_BCKL, state);
+#else
     gpio_set_level(LCD_PIN_BCKL, !state);
+#endif
 }
 
 void lcd_rst();
@@ -45,7 +51,6 @@ void lcd_write_data(uint16_t *data, int len);
 void lcd_set_index(uint16_t x_start, uint16_t y_start, uint16_t x_end, uint16_t y_end);
 
 void lcd_clear(uint16_t color);
-
 #ifdef __cplusplus
 }
 #endif
