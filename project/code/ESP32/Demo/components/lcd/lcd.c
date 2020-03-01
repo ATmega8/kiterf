@@ -56,6 +56,11 @@ void lcd_write_data(uint16_t *data, int len)
     if (len <= 0) {
         return;
     }
+
+	if (data == NULL) {
+		return;
+	}
+
     xSemaphoreTake(lcd_write_mux, portMAX_DELAY);
     spi_transaction_t t, *rtrans;
     memset(&t, 0, sizeof(t));         //Zero out the transaction
