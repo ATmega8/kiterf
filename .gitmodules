@@ -22,3 +22,6 @@
 [submodule "project/code/ESP32/Demo/components/esp_lua"]
 	path = project/code/ESP32/Demo/components/esp_lua
 	url = https://github.com/xiongyumail/esp_lua.git
+[submodule "project/code/ESP32/Demo/components/esp-dsp"]
+	path = project/code/ESP32/Demo/components/esp-dsp
+	url = https://github.com/espressif/esp-dsp.git
