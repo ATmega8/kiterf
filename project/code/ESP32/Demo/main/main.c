@@ -16,102 +16,21 @@
 #include "lvgl.h"
 #include "lcd.h"
 #include "esp_lua.h"
+#include "esp_dsp.h"
 
-#define FFT_N               512U
+#include "waterfall.h"
+
 #define FFT_FORWARD_SHIFT   0x0U
 #define FFT_BACKWARD_SHIFT  0x1ffU
 #define PI                  3.14159265358979323846
 
-enum _complex_mode {
-    FFT_SOFT = 0,
-    FFT_COMPLEX_MAX,
-} ;
-
-enum _fft_direction {
-    FFT_DIR_BACKWARD = 0,
-    FFT_DIR_FORWARD,
-    FFT_DIR_MAX,
-} ;
-
-enum _time_get {
-    TEST_START = 0,
-    TEST_STOP = 1,
-    TEST_TIME_MAX,
-} ;
-
-float soft_power[FFT_N];
-float soft_angel[FFT_N];
-struct timeval get_time[FFT_COMPLEX_MAX][FFT_DIR_MAX][TEST_TIME_MAX];
+extern lv_img_dsc_t waterfall;
 
 SemaphoreHandle_t matrix_sem = NULL;
 SemaphoreHandle_t dsp_sem = NULL;
 
 void fft_task(void *arg)
 {
-    int32_t i;
-    float tempf1[3];
-    complex data_soft[FFT_N] = {0};
-
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-    /* Data prepared for fft hard calculation and fft soft calculation. */
-    for (i = 0; i < FFT_N; i++) {
-        tempf1[0] = 0.3 * cosf(2 * PI * i / FFT_N + PI / 3) * 256;
-        tempf1[1] = 0.1 * cosf(16 * 2 * PI * i / FFT_N - PI / 9) * 256;
-        tempf1[2] = 0.5 * cosf((19 * 2 * PI * i / FFT_N) + PI / 6) * 256;
-        data_soft[i].real = (int16_t)(tempf1[0] + tempf1[1] + tempf1[2] + 10);
-        data_soft[i].imag = (int16_t)0;
-    }
-
-    /* FFT soft calculation. */
-    gettimeofday(&get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_START], NULL);
-    fft_soft(data_soft, FFT_N);
-    gettimeofday(&get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_STOP], NULL);
-
-    printf("\n[soft fft real][soft fft imag]\n");
-
-    for (i = 0; i < FFT_N / 2; i++)
-        printf("%3d:%7d %7d\n",
-               i, (int32_t)data_soft[i].real, (int32_t)data_soft[i].imag);
-
-    /* Power calculation. */
-    for (i = 0; i < FFT_N; i++) {
-        soft_power[i] = sqrt(data_soft[i].real * data_soft[i].real + data_soft[i].imag * data_soft[i].imag) * 2;
-    }
-
-    printf("\nsoft power:\n");
-    printf("%3d : %f\n", 0, soft_power[0] / 2 / FFT_N);
-
-    for (i = 1; i < FFT_N / 2; i++) {
-        printf("%3d : %f\n", i, soft_power[i] / FFT_N);
-    }
-
-    printf("\nsoft phase:\n");
-
-    for (i = 0; i < FFT_N / 2; i++) {
-        soft_angel[i] = atan2(data_soft[i].imag, data_soft[i].real);
-        printf("%3d : %f\n", i, soft_angel[i] * 180 / PI);
-    }
-
-    /* IFFT soft calculation. */
-    gettimeofday(&get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START], NULL);
-    ifft_soft(data_soft, FFT_N);
-    gettimeofday(&get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP], NULL);
-
-    printf("\n[soft ifft real][soft ifft imag]\n");
-
-    for (i = 0; i < FFT_N / 2; i++)
-        printf("%3d:%7d %7d\n",
-               i, (int32_t)data_soft[i].real, (int32_t)data_soft[i].imag);
-
-    printf("[soft ][%d bytes][forward time = %ld us][backward time = %ld us]\n",
-           FFT_N,
-           (get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_STOP].tv_sec - get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_START].tv_sec) * 1000 * 1000 +
-           (get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_STOP].tv_usec - get_time[FFT_SOFT][FFT_DIR_FORWARD][TEST_START].tv_usec),
-           (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_sec - get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_sec) * 1000 * 1000 +
-           (get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_STOP].tv_usec - get_time[FFT_SOFT][FFT_DIR_BACKWARD][TEST_START].tv_usec));
-    xSemaphoreGive(matrix_sem);
-
     vTaskSuspend(NULL);
 }
 
@@ -224,8 +143,6 @@ void dsp_task(void *arg)
     vTaskSuspend(NULL);
 }
 
-
-
 void IRAM_ATTR lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
 {
     int32_t x;
@@ -248,77 +165,20 @@ void lvgl_task(void *arg)
     disp_drv.disp_flush = lvgl_disp_flush;     /*Set your driver function*/
     lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
-    /*Create a Calendar object*/
-    lv_obj_t * calendar = lv_calendar_create(lv_scr_act(), NULL);
-    lv_obj_set_size(calendar, 240, 220);
-    lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_t* waterfall_image = lv_img_create(lv_scr_act(), NULL);
+    lv_img_set_src(waterfall_image, &waterfall);
+    lv_obj_align(waterfall_image, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -20);
 
-    /*Create a style for the current week*/
-    static lv_style_t style_week_box;
-    lv_style_copy(&style_week_box, &lv_style_plain);
-    style_week_box.body.border.width = 1;
-    style_week_box.body.border.color = LV_COLOR_HEX3(0x333);
-    style_week_box.body.empty = 1;
-    style_week_box.body.radius = LV_RADIUS_CIRCLE;
-    style_week_box.body.padding.ver = 3;
-    style_week_box.body.padding.hor = 3;
-
-    /*Create a style for today*/
-    static lv_style_t style_today_box;
-    lv_style_copy(&style_today_box, &lv_style_plain);
-    style_today_box.body.border.width = 2;
-    style_today_box.body.border.color = LV_COLOR_NAVY;
-    style_today_box.body.empty = 1;
-    style_today_box.body.radius = LV_RADIUS_CIRCLE;
-    style_today_box.body.padding.ver = 3;
-    style_today_box.body.padding.hor = 3;
-    style_today_box.text.color= LV_COLOR_BLUE;
-
-    /*Create a style for the highlighted days*/
-    static lv_style_t style_highlighted_day;
-    lv_style_copy(&style_highlighted_day, &lv_style_plain);
-    style_highlighted_day.body.border.width = 2;
-    style_highlighted_day.body.border.color = LV_COLOR_NAVY;
-    style_highlighted_day.body.empty = 1;
-    style_highlighted_day.body.radius = LV_RADIUS_CIRCLE;
-    style_highlighted_day.body.padding.ver = 3;
-    style_highlighted_day.body.padding.hor = 3;
-    style_highlighted_day.text.color= LV_COLOR_BLUE;
-
-    /*Apply the styles*/
-    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_WEEK_BOX, &style_week_box);
-    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_TODAY_BOX, &style_today_box);
-    lv_calendar_set_style(calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, &style_highlighted_day);
-
-
-    /*Set the today*/
-    lv_calendar_date_t today;
-    today.year = 2018;
-    today.month = 10;
-    today.day = 23;
-
-    lv_calendar_set_today_date(calendar, &today);
-    lv_calendar_set_showed_date(calendar, &today);
-
-    /*Highlight some days*/
-    static lv_calendar_date_t highlihted_days[3];       /*Only it's pointer will be saved so should be static*/
-    highlihted_days[0].year = 2018;
-    highlihted_days[0].month = 10;
-    highlihted_days[0].day = 6;
-
-    highlihted_days[1].year = 2018;
-    highlihted_days[1].month = 10;
-    highlihted_days[1].day = 11;
-
-    highlihted_days[2].year = 2018;
-    highlihted_days[2].month = 11;
-    highlihted_days[2].day = 22;
-
-    lv_calendar_set_highlighted_dates(calendar, highlihted_days, 3);
+    uint32_t waterfallTimer = xTaskGetTickCount();
 
     while (1) {
+        if((xTaskGetTickCount() - waterfallTimer) > ( 100 / portTICK_PERIOD_MS)) {
+            waterfallTimer = xTaskGetTickCount();
+            lvgl_update_waterfall(waterfall_image);
+        }
+
         lv_task_handler();
-        vTaskDelay(10 / portTICK_RATE_MS);
+        vTaskDelay(10/portTICK_RATE_MS);
     }
 }
 
@@ -339,10 +199,10 @@ void app_main()
 
     vTaskDelay(5000 / portTICK_RATE_MS);
 
-    const char *ESP_LUA_ARGV[2] = {"./lua", NULL};
-    esp_lua_init(NULL, NULL, NULL);
+    //const char *ESP_LUA_ARGV[2] = {"./lua", NULL};
+    //esp_lua_init(NULL, NULL, NULL);
     while (1) {
-        esp_lua_main(1, ESP_LUA_ARGV);
+        //esp_lua_main(1, ESP_LUA_ARGV);
     }
 
     vTaskSuspend(NULL);
