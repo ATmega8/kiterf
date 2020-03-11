@@ -4,6 +4,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <math.h>
+#include <tca9555.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -19,6 +20,9 @@
 #include "esp_dsp.h"
 
 #include "waterfall.h"
+#include "msi001.h"
+#include "rfswitch.h"
+#include "cs5361.h"
 
 #define FFT_FORWARD_SHIFT   0x0U
 #define FFT_BACKWARD_SHIFT  0x1ffU
@@ -191,16 +195,23 @@ void app_main()
 
     lv_init();
     lcd_init();
+    tac9555_i2c_init();
+    vTaskDelay(100);
+    tca9555_init();
+    msi001_standby();
+    rf_switch_set_mode(RF_SWITCH_VHF1_MODE);
+    cs5361_init();
 
-    xTaskCreate(fft_task, "fft_task", 2560 * 4, NULL, 5, NULL);
-    xTaskCreate(matrix_task, "matrix_task", 512 * 4, NULL, 5, NULL);
-    xTaskCreate(dsp_task, "dsp_task", 1024 * 4, NULL, 5, NULL);
+    //xTaskCreate(fft_task, "fft_task", 2560 * 4, NULL, 5, NULL);
+    //xTaskCreate(matrix_task, "matrix_task", 512 * 4, NULL, 5, NULL);
+    //xTaskCreate(dsp_task, "dsp_task", 1024 * 4, NULL, 5, NULL);
     xTaskCreate(lvgl_task, "lvgl_task", 1024 * 4, NULL, 5, NULL);
 
     vTaskDelay(5000 / portTICK_RATE_MS);
 
     //const char *ESP_LUA_ARGV[2] = {"./lua", NULL};
     //esp_lua_init(NULL, NULL, NULL);
+
     while (1) {
         //esp_lua_main(1, ESP_LUA_ARGV);
     }
