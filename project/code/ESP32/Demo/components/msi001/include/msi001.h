@@ -44,6 +44,8 @@ typedef struct {
    uint32_t        f_real_rf;
 } msi001_t;
 
-int msi001_set_tuner(msi001_t *dev);
+int msi001_set_tuner_frequency(uint32_t freq);
+int msi001_set_gain(uint32_t gain);
 int msi001_standby();
+int msi001_wreg(uint32_t data);
 #endif //MSI001_MSI001_H

@@ -1,8 +1,8 @@
 #include "tca9555.h"
 #include "driver/i2c.h"
 
-#define TCA9555_SCL_PIN 16
-#define TCA9555_SDA_PIN 17
+#define TCA9555_SCL_PIN 25
+#define TCA9555_SDA_PIN 26
 
 #define I2C_MASTER_NUM     I2C_NUM_0
 #define I2C_MASTER_FREQ_HZ 100000

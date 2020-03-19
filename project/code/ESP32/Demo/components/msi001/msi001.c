@@ -6,6 +6,10 @@
 #include <string.h>
 
 #include "driver/spi_master.h"
+#include "esp_log.h"
+#include "rfswitch.h"
+
+static const char* MSI001_TAG="MSI001";
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
@@ -17,8 +21,8 @@
 
 #define PIN_NUM_MISO -1
 #define PIN_NUM_MOSI 15
-#define PIN_NUM_CLK  14
-#define PIN_NUM_CS   13
+#define PIN_NUM_CLK  16
+#define PIN_NUM_CS   17
 
 spi_device_handle_t  spi;
 
@@ -97,13 +101,8 @@ static unsigned long gcd(unsigned long a, unsigned long b) {
     }
 }
 
-static void delayUS(uint32_t us) {
-    while (us--) {
-
-    }
-}
-
-static int spi_write(uint8_t *pdata, uint8_t len) {
+static int spi_write(uint8_t *pdata, uint8_t len)
+{
     esp_err_t ret;
     spi_transaction_t t;
     if (len==0) return 0;             //no need to send anything
@@ -112,13 +111,13 @@ static int spi_write(uint8_t *pdata, uint8_t len) {
 
     t.length=len*8;                 //Len is in bytes, transaction length is in bits.
     t.tx_buffer=pdata;               //Data
-    t.user=(void*)1;                //D/C needs to be set to 1
     ret=spi_device_polling_transmit(spi, &t);  //Transmit!
     assert(ret==ESP_OK);            //Should have had no issues.
     return 0;
 }
 
-static int msi001_wreg(uint32_t data) {
+int msi001_wreg(uint32_t data)
+{
     uint8_t buf[3];
     buf[2] = (uint8_t) (data & 0x000000FF);
     buf[1] = (uint8_t) ((data & 0x0000FF00) >> 8);
@@ -127,226 +126,137 @@ static int msi001_wreg(uint32_t data) {
     return spi_write(buf, 3);
 };
 
-static int msi001_set_gain(msi001_t *dev) {
-    int ret;
+int msi001_set_gain(uint32_t gain)
+{
     uint32_t reg;
 
     reg = 1 << 0;
-    reg |= (59 - dev->if_gain) << 4;
+    reg |= gain << 4;
     reg |= 0 << 10;
-    reg |= (1 - dev->mixer_gain) << 12;
-    reg |= (1 - dev->lna_gain) << 13;
+    reg |= 0 << 12;
+    reg |= 0 << 13;
     reg |= 4 << 14;
-    reg |= 0 << 17;
-    ret = msi001_wreg(reg);
+    reg |= 1 << 17;
+    msi001_wreg(reg);
 
-    if (ret) {
-        goto err;
-    }
+    ESP_LOGI(MSI001_TAG, "reg1: %06X", reg);
 
     return 0;
-    err:
-    return ret;
 };
 
-int msi001_set_tuner(msi001_t *dev) {
-    int ret, i;
-    uint32_t uitmp, div_n, k, k_thresh, k_frac, div_lo = 1, f_if1;
-    uint32_t reg;
-    uint64_t f_vco;
-    uint8_t mode = 0, filter_mode;
-
+static void msi001_set_am_filter(uint32_t freq)
+{
     static const struct {
         uint32_t rf;
-        uint8_t mode;
-        uint8_t div_lo;
-    } band_lut[] = {
-            {50000000,  0xe1, 16}, /* AM_MODE2, antenna 2 */
-            {108000000, 0x42, 32}, /* VHF_MODE */
-            {330000000, 0x44, 16}, /* B3_MODE */
-            {960000000, 0x48, 4}, /* B45_MODE */
-            {~0U,       0x50, 2}, /* BL_MODE */
-    };
-    static const struct {
-        uint32_t freq;
-        uint8_t filter_mode;
-    } if_freq_lut[] = {
-            {0,       0x03}, /* Zero IF */
-            {450000,  0x02}, /* 450 kHz IF */
-            {1620000, 0x01}, /* 1.62 MHz IF */
-            {2048000, 0x00}, /* 2.048 MHz IF */
-    };
-    static const struct {
-        uint32_t freq;
-        uint8_t val;
-    } bandwidth_lut[] = {
-            {200000,  0x00}, /* 200 kHz */
-            {300000,  0x01}, /* 300 kHz */
-            {600000,  0x02}, /* 600 kHz */
-            {1536000, 0x03}, /* 1.536 MHz */
-            {5000000, 0x04}, /* 5 MHz */
-            {6000000, 0x05}, /* 6 MHz */
-            {7000000, 0x06}, /* 7 MHz */
-            {8000000, 0x07}, /* 8 MHz */
+        rf_switch_band_t filter;
+    } am_filter_lut[]={
+            {12000000, RF_BAND_0_12_MHz},
+            {30000000, RF_BAND_12_30MHz},
+            {60000000, RF_BAND_30_60_MHz}
     };
 
-    uint32_t f_rf = dev->f_rf;
+    rf_switch_band_t am_filter = RF_BAND_0_12_MHz;
 
-    /*
-     * bandwidth (Hz)
-     * 200000, 300000, 600000, 1536000, 5000000, 6000000, 7000000, 8000000
-     */
-    unsigned int bandwidth;
-
-    /*
-     * intermediate frequency (Hz)
-     * 0, 450000, 1620000, 2048000
-     */
-    unsigned int f_if = 0;
-#define F_REF 24576000
-#define DIV_PRE_N 4
-#define    F_VCO_STEP 100000 /*1KHz*/
-
-    for (i = 0; i < ARRAY_SIZE(band_lut); i++) {
-        if (f_rf <= band_lut[i].rf) {
-            mode = band_lut[i].mode;
-            div_lo = band_lut[i].div_lo;
+    for(int i = 0 ; i < ARRAY_SIZE(am_filter_lut); i++) {
+        if(freq <= am_filter_lut[i].rf) {
+            am_filter = am_filter_lut[i].filter;
             break;
         }
     }
 
-    if (i == ARRAY_SIZE(band_lut)) {
-        ret = -1;
-        goto err;
+    rf_switch_set_band(am_filter);
+}
+
+int msi001_set_tuner_frequency(uint32_t freq)
+{
+    uint8_t  mode = 0x42;
+    uint8_t  lo_div = 32;
+    rf_switch_mode_t rf_band = RF_SWITCH_VHF1_MODE;
+
+    /* find band index */
+    static const struct {
+        uint32_t rf;
+        uint8_t mode;
+        uint8_t div_lo;
+        rf_switch_mode_t rf_mode;
+    } band_lut[] = {
+            {50000000,  0xe1, 16, RF_SWITCH_AM_MODE},   /* AM_MODE2, antenna 2 */
+            {108000000, 0x42, 32, RF_SWITCH_VHF1_MODE}, /* VHF_MODE */
+            {330000000, 0x44, 16, RF_SWITCH_VHF2_MODE}, /* B3_MODE */
+            {960000000, 0x48, 4, RF_SWITCH_B45_MODE},   /* B45_MODE */
+            {~0U,       0x50, 2, RF_SWITCH_LBAND_MODE}  /* BL_MODE */
+    };
+
+    for (int i = 0; i < ARRAY_SIZE(band_lut); i++) {
+        if (freq <= band_lut[i].rf) {
+            mode    = band_lut[i].mode;
+            lo_div  = band_lut[i].div_lo;
+            rf_band = band_lut[i].rf_mode;
+            break;
+        }
+    }
+    /* set rf band switch */
+    rf_switch_set_mode(rf_band);
+    ESP_LOGI(MSI001_TAG, "Set rf band to: %d", rf_band);
+
+    /* set am filter switch */
+    if(rf_band == RF_SWITCH_AM_MODE) {
+        msi001_set_am_filter(freq);
     }
 
-    /* AM_MODE is upconverted */
-    if ((mode >> 0) & 0x1) {
-        f_if1 = 5 * F_REF;
+    /* reg0 value */
+    uint32_t reg0 = 0;
+    reg0 |= mode << 4;
+    reg0 |= 0x03 << 12; /* Zero IF */
+    reg0 |= 0x00 << 14; /* IF bandwidth: 200K */
+    reg0 |= 0x02 << 17; /* fref: 24.576MHz */
+    reg0 |= 0x00 << 20;
+
+    uint64_t f_synth = 0;
+    uint32_t f_if    = 0;
+    uint32_t f_if1   = 122880000;
+    uint32_t fref    = 24576000;
+
+    if(rf_band == RF_SWITCH_AM_MODE) {
+        //AM
+        f_synth = (freq + f_if + f_if1)*lo_div;
     } else {
-        f_if1 = 0;
+        f_synth = (freq + f_if)*lo_div;
     }
 
-    i = dev->f_if;
+    uint32_t f_step = 1;
 
-    if (i >= ARRAY_SIZE(if_freq_lut)) {
-        ret = -1;
-        goto err;
-    }
+    uint32_t k_thresh = (fref * 4)/(lo_div * f_step);
+    uint64_t k_int = f_synth/(fref*4);
+    uint64_t k_frac = ((f_synth*k_thresh)/(fref * 4))-k_int*k_thresh;
 
-    filter_mode = if_freq_lut[i].filter_mode;
-    f_if = if_freq_lut[i].freq;
+    uint64_t k = gcd(k_frac, k_thresh);
 
+    k_frac   /= k;
+    k_thresh /= k;
 
-    /* filters */
-    i = dev->filter;
+    uint32_t reg5 = 5 << 0;
+    reg5 |= k_thresh << 4;
+    reg5 |= 1 << 19;
+    reg5 |= 1 << 21;
 
-    if (i >= ARRAY_SIZE(bandwidth_lut)) {
-        ret = -1;
-        goto err;
-    }
+    uint32_t reg2 = 2 << 0;
+    reg2 |= k_frac<< 4;
+    reg2 |= k_int << 16;
 
-    bandwidth = bandwidth_lut[i].val;
+    msi001_wreg(0x0e);
+    msi001_wreg(reg0);
+    msi001_wreg(reg5);
+    msi001_wreg(reg2);
+    msi001_wreg(0x140a1);
+    msi001_wreg(0x3FFFF6);
+    msi001_wreg(0x03);
 
-    /*
-     * Fractional-N synthesizer
-     *
-     *           +---------------------------------------+
-     *           v                                       |
-     *  Fref   +----+     +-------+         +----+     +------+     +---+
-     * ------> | PD | --> |  VCO  | ------> | /4 | --> | /N.F | <-- | K |
-     *         +----+     +-------+         +----+     +------+     +---+
-     *                      |
-     *                      |
-     *                      v
-     *                    +-------+  Fout
-     *                    | /Rout | ------>
-     *                    +-------+
-     */
-
-    /* Calculate PLL integer and fractional control word. */
-    f_vco = (uint64_t) (f_rf + f_if + f_if1) * div_lo;
-    div_n = div_u64_rem(f_vco, DIV_PRE_N * F_REF, &k);
-    k_thresh = (DIV_PRE_N * F_REF) / (F_VCO_STEP * div_lo);
-    k_frac = div_u64((uint64_t) k * k_thresh, (DIV_PRE_N * F_REF));
-
-    /* Find out greatest common divisor and divide to smaller. */
-    uitmp = gcd(k_thresh, k_frac);
-    k_thresh /= uitmp;
-    k_frac /= uitmp;
-
-    /* Force divide to reg max. Resolution will be reduced. */
-    uitmp = DIV_ROUND_UP(k_thresh, 4095);
-    k_thresh = DIV_ROUND_CLOSEST(k_thresh, uitmp);
-    k_frac = DIV_ROUND_CLOSEST(k_frac, uitmp);
-
-    /* Calculate real RF set. */
-    uitmp = (unsigned int) F_REF * DIV_PRE_N * div_n / div_lo;
-    uitmp += (unsigned int) F_REF * DIV_PRE_N * k_frac / (k_thresh * div_lo);
-    uitmp /= div_lo;
-    dev->f_real_rf = uitmp;
-
-    reg = 0 << 0;
-    reg |= mode << 4;
-    reg |= filter_mode << 12;
-    reg |= bandwidth << 14;
-    reg |= 0x02 << 17;
-    reg |= 0x00 << 20;
-    ret = msi001_wreg(reg);
-
-    if (ret) {
-        goto err;
-    }
-
-    reg = 5 << 0;
-    reg |= k_thresh << 4;
-    reg |= 1 << 19;
-    reg |= 1 << 21;
-    ret = msi001_wreg(reg);
-
-    if (ret) {
-        goto err;
-    }
-
-    reg = 2 << 0;
-    reg |= k_frac << 4;
-    reg |= div_n << 16;
-    ret = msi001_wreg(reg);
-
-    if (ret) {
-        goto err;
-    }
-
-    /*ret = msi001_set_gain(dev);
-
-    if (ret) {
-        goto err;
-    }
-
-    reg = 6 << 0;
-    reg |= 63 << 4;
-    reg |= 4095 << 10;
-    ret = msi001_wreg(reg);
-
-    if (ret) {
-        goto err;
-    }
-
-    ret = msi001_wreg(0x000004);
-
-    if (ret) {
-        goto err;
-    }
-
-    ret = msi001_wreg(0x000003);
-
-    if (ret) {
-        goto err;
-    }*/
+    ESP_LOGI(MSI001_TAG, "reg0: %06X", reg0);
+    ESP_LOGI(MSI001_TAG, "reg5: %06X", reg5);
+    ESP_LOGI(MSI001_TAG, "reg2: %06X", reg2);
 
     return 0;
-    err:
-    return ret;
 }
 
 void spi_pre_transfer_callback(spi_transaction_t *t)
@@ -366,7 +276,7 @@ static int msi001_spi_init() {
     };
 
     spi_device_interface_config_t devcfg={
-            .clock_speed_hz=1*1000*1000,  //Clock out at 1 MHz
+            .clock_speed_hz=1*1000*100,   //Clock out at 0.1 MHz
             .mode=0,                            //SPI mode 0
             .spics_io_num=PIN_NUM_CS,           //CS pin
             .queue_size=7,                      //We want to be able to queue 7 transactions at a time
@@ -384,12 +294,14 @@ static int msi001_spi_init() {
 
 int msi001_standby() {
     msi001_spi_init();
-
+    msi001_wreg(0x0e);
     msi001_wreg(0x43420); /* low power IF mode */
     msi001_wreg(0x2800f5);
     msi001_wreg(0x200012);
     msi001_wreg(0x140a1);
     msi001_wreg(0x3FFFF6);
     msi001_wreg(0x7c03);
+
+    ESP_LOGI(MSI001_TAG, "msi001 init ok");
     return 0;
 }
