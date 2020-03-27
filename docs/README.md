@@ -1,263 +1,134 @@
-# _KiteRF_
+# Lanyon
 
-[![Build](https://travis-ci.org/ATmega8/kiterf.svg?branch=master "build badge")](https://travis-ci.org/ATmega8/kiterf "build")
-[![Release](https://img.shields.io/github/release/ATmega8/kiterf.svg "release badge")](https://github.com/ATmega8/kiterf/releases/latest/ "release")
-[![Release](https://img.shields.io/github/issues/ATmega8/kiterf.svg "issues badge")](https://github.com/ATmega8/kiterf/issues "issues")
+Lanyon is an unassuming [Jekyll](http://jekyllrb.com) theme that places content first by tucking away navigation in a hidden drawer. It's based on [Poole](http://getpoole.com), the Jekyll butler.
 
-_KiteRF is a SDR system with K210 & FPGA & ESP32 as its core controller, which make SDR more intelligent, portable and cheap._
+![Lanyon](https://f.cloud.github.com/assets/98681/1825266/be03f014-71b0-11e3-9539-876e61530e24.png)
+![Lanyon with open sidebar](https://f.cloud.github.com/assets/98681/1825267/be04a914-71b0-11e3-966f-8afe9894c729.png)
 
-* KiteRF Structure
-
-  ![KiteRF](data/kiterf_structure.svg)
-
-  * DS (Digital Signal) unit
-
-    * FPGA (Field-Programmable Gate Array)
-
-      * Radio Frequency Data Processing
-
-      * DS Control
-
-      * Communication with PC
-
-    * K210 (Kendryte K210)
-
-      * LCD control
-
-      * Camera control
-
-      * Audio
-
-      * FFT
-
-    * ESP32 (Espressif ESP32)
-
-      * Wi-Fi Data Transmission
-
-      * SDCARD control
-
-      * Touch Button
-
-      * RGB LED Control
-
-  * RF (Radio Frequency) unit
-
-    * ADC (Analog-to-Digital Converter)
-    
-      * Sampling Analog Baseband IQ Data
-
-    * DAC (Digital-to-Analog Converter)
-
-      * Output Analog Baseband IQ Data 
-
-    * RF Transceiver
-
-      * Mixing IF signal to baseband and outputting IQ analog signal
-
-    * VCO (Voltage-Controlled Oscillator)
-
-      * Provide local IF frequency
-
-    * Mixer (Frequency mixer)
-
-      * Mixing HF signal to IF signal
-
-    * LNA (Low-Noise Amplifier)
-
-      * Suppression of Mirror Noise Signal
-
-    * RF Switch
-
-      * Switching signal paths in different frequencies
-
-* KiteRF core-board v1.0.0
-
-  ![KiteRF](data/kiterf_1.0.0.jpg)
 
 ## Contents
 
-![Contents](https://img.shields.io/github/repo-size/ATmega8/kiterf.svg)
+- [Usage](#usage)
+- [Options](#options)
+  - [Sidebar menu](#sidebar-menu)
+  - [Themes](#themes)
+  - [Reverse layout](#reverse-layout)
+- [Development](#development)
+- [Author](#author)
+- [License](#license)
 
-* Directory tree
 
-    ```
-    ├── add_path.sh
-    ├── data
-    │   ├── kendryte_datasheet.pdf
-    │   ├── kendryte_freertos_programming_guide.pdf
-    │   ├── kiterf_1.0.0.jpg
-    │   ├── kiterf_structure.pos
-    │   └── kiterf_structure.svg
-    ├── docs
-    │   └── Doxyfile
-    ├── LICENSE
-    ├── project
-    │   ├── code
-    │   │   ├── ESP32
-    │   │   ├── ESP8266
-    │   │   └── K210
-    │   └── pcb
-    │       ├── K210
-    │       └── RF
-    ├── README.md
-    └── tools
-        ├── cmake-3.14.2
-        ├── ESP32
-        │   └── esp-idf
-        ├── ESP8266
-        │   ├── ESP8266_RTOS_SDK
-        │   └── xtensa-lx106-elf
-        └── K210
-            ├── kendryte-freertos-sdk
-            ├── kendryte-toolchain
-            └── kflash
-    ```
+## Usage
 
-    * project
+Lanyon is a theme built on top of [Poole](https://github.com/poole/poole), which provides a fully furnished Jekyll setup—just download and start the Jekyll server. See [the Poole usage guidelines](https://github.com/poole/poole#usage) for how to install and use Jekyll.
 
-      * PCB project (KiCAD)
 
-      * FPGA project (ISE)
+## Options
 
-      * ESP32 project (esp-idf)
+Lanyon includes some customizable options, typically applied via classes on the `<body>` element.
 
-      * K210 project (Kendryte FreeRTOS)
 
-    * release
+### Sidebar menu
 
-      * PCB Gerber
+Create a list of nav links in the sidebar by assigning each Jekyll page the correct layout in the page's [front-matter](http://jekyllrb.com/docs/frontmatter/).
 
-      * FPGA bin
+```
+---
+layout: page
+title: About
+---
+```
 
-      * ESP32 bin
+**Why require a specific layout?** Jekyll will return *all* pages, including the `atom.xml`, and with an alphabetical sort order. To ensure the first link is *Home*, we exclude the `index.html` page from this list by specifying the `page` layout.
 
-      * K210 bin
 
-    * tools
+### Themes
 
-      * script
+Lanyon ships with eight optional themes based on the [base16 color scheme](https://github.com/chriskempson/base16). Apply a theme to change the color scheme (mostly applies to sidebar and links).
 
-      * SDK
+![Lanyon with red theme](https://f.cloud.github.com/assets/98681/1825270/be065110-71b0-11e3-9ed8-9b8de753a4af.png)
+![Lanyon with red theme and open sidebar](https://f.cloud.github.com/assets/98681/1825269/be05ec20-71b0-11e3-91ea-a9138ef07186.png)
 
-      * toolchain
+There are eight themes available at this time.
 
-## How to use
+![Available theme classes](https://f.cloud.github.com/assets/98681/1817044/e5b0ec06-6f68-11e3-83d7-acd1942797a1.png)
 
-You can follow the steps below to set up the development environment, or directly download the release version of the full environment.
+To use a theme, add any one of the available theme classes to the `<body>` element in the `default.html` layout, like so:
 
-* clone
+```html
+<body class="theme-base-08">
+  ...
+</body>
+```
 
-  ```bash
-  git clone --recursive https://github.com/ATmega8/kiterf
-  cd kiterf
-  ```
+To create your own theme, look to the Themes section of [included CSS file](https://github.com/poole/lanyon/blob/master/public/css/lanyon.css). Copy any existing theme (they're only a few lines of CSS), rename it, and change the provided colors.
 
-  * note
 
-    Don't omit `--recursive`, because we use submodule.
+### Reverse layout
 
-* update
+![Lanyon with reverse layout](https://f.cloud.github.com/assets/98681/1825265/be03f2e4-71b0-11e3-89f1-360705524495.png)
+![Lanyon with reverse layout and open sidebar](https://f.cloud.github.com/assets/98681/1825268/be056174-71b0-11e3-88c8-5055bca4307f.png)
 
-  ```bash
-  git pull
-  git submodule update --init --recursive
-  ```
+Reverse the page orientation with a single class.
 
-* Add environment variables
+```html
+<body class="layout-reverse">
+  ...
+</body>
+```
 
-  ```bash
-  . add_path.sh
-  ```
-  * note
 
-    Don't forget `"."`
+### Sidebar overlay instead of push
 
-* Install toolchain
+Make the sidebar overlap the viewport content with a single class:
 
-  * K210
+```html
+<body class="sidebar-overlay">
+  ...
+</body>
+```
 
-    * Ubuntu/Debian/Kali
+This will keep the content stationary and slide in the sidebar over the side content. It also adds a `box-shadow` based outline to the toggle for contrast against backgrounds, as well as a `box-shadow` on the sidebar for depth.
 
-      ```bash
-      wget https://www.kiterf.xyz/download/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
-      tar zxvf kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz -C tools/K210/
-      rm kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
-      ```
-    
-    * Arch
+It's also available for a reversed layout when you add both classes:
 
-      ```bash
-      wget https://www.kiterf.xyz/download/kendryte-toolchain-arch-amd64-8.2.0-20190415.tar.gz
-      tar zxvf kendryte-toolchain-arch-amd64-8.2.0-20190415.tar.gz -C tools/K210/
-      rm kendryte-toolchain-arch-amd64-8.2.0-20190415.tar.gz
-      ```
+```html
+<body class="layout-reverse sidebar-overlay">
+  ...
+</body>
+```
 
-  * ESP32
+### Sidebar open on page load
 
-    * Ubuntu/Debian/Kali/Arch
+Show an open sidebar on page load by modifying the `<input>` tag within the `sidebar.html` layout to add the `checked` boolean attribute:
 
-      ```bash
-      cd tools/ESP32/esp-idf
-      ./install.sh
-      cd $KITERF_PATH
-      ```
+```html
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" checked>
+```
 
-  * ESP8266
+Using Liquid you can also conditionally show the sidebar open on a per-page basis. For example, here's how you could have it open on the homepage only:
 
-    KiteRF also integrates the ESP8266 development environment, which is not necessary, and you can choose to ignore it.
+```html
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" {% if page.title =="Home" %}checked{% endif %}>
+```
 
-    * Ubuntu/Debian/Kali/Arch
+## Development
 
-      ```bash
-      wget https://www.kiterf.xyz/download/xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
-      tar zxvf xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz -C tools/ESP8266/
-      rm xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
-      ```
+Lanyon has two branches, but only one is used for active development.
 
-  * CMake
+- `master` for development.  **All pull requests should be to submitted against `master`.**
+- `gh-pages` for our hosted site, which includes our analytics tracking code. **Please avoid using this branch.**
 
-    * Ubuntu/Debian/Kali/Arch
 
-      ```bash
-      wget https://www.kiterf.xyz/download/cmake-3.14.2.tar.gz
-      tar xf cmake-3.14.2.tar.gz -C tools/
-      cd tools/cmake-3.14.2
-      ./configure
-      # Please do not use all CPU cores to compile, otherwise your computer may crash.
-      make -j2
-      cd $KITERF_PATH
-      rm cmake-3.14.2.tar.gz
-      ```
+## Author
 
-## Release
+**Mark Otto**
+- <https://github.com/mdo>
+- <https://twitter.com/mdo>
 
-* download
-
-  ```bash
-  wget https://www.kiterf.xyz/download/kiterf-debain-amd64-1.2.0-20190517.tar.gz
-  tar zxvf kiterf-debain-amd64-1.2.0-20190517.tar.gz
-  rm kiterf-debain-amd64-1.2.0-20190517.tar.gz
-  cd kiterf
-  ```
-* Add environment variables
-
-  ```bash
-  . add_path.sh
-  ```
-  * note
-
-    Don't forget `"."`
 
 ## License
 
-[![License](https://img.shields.io/github/license/ATmega8/kiterf.svg)](LICENSE)
+Open sourced under the [MIT license](LICENSE.md).
 
-* MIT License
- 
-  A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.
-
-## Contributing
-
-![Stars](https://img.shields.io/github/stars/ATmega8/kiterf.svg?style=social)
-
-If you want to support this project, we hope you can contribute your code or circuit.
+<3
