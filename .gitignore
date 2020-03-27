@@ -43,3 +43,6 @@ docs/doxygen_sqlite3.db
 *xtensa-esp32-elf
 *xtensa-lx106-elf
 *cmake-3.14.2
+
+#jekyll-cache
+docs/.jekyll-cache/*
