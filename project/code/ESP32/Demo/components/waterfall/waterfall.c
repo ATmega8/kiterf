@@ -66,9 +66,22 @@ static void waterfall_scroll(uint32_t height, uint32_t width, uint8_t *data)
     }
 }
 
-void lvgl_update_waterfall(lv_obj_t* waterfall_image)
+const float Q = 1.0 / (0x7fffff + 0.5);
+
+static float uint_to_float(uint32_t data)
 {
-    float i_data, q_data;
+    data >>= 8;
+
+    if(data& 0x800000) {
+        data|= ~0xFFFFFF;
+    }
+
+    return data*Q;
+}
+
+void waterfall_do_fft(const uint8_t* iq_data)
+{
+    uint32_t  i_data_u, q_data_u;
     float* iptr = &fft_data[0];
     float* qptr = &fft_data[FFT_N];
 
@@ -77,11 +90,11 @@ void lvgl_update_waterfall(lv_obj_t* waterfall_image)
 
     /* Data prepared for fft hard calculation and fft soft calculation. */
     for (int i = 0; i < FFT_N; i++) {
-        memcpy(&i_data, &iq_98608_1_bin[i*8], 4);
-        memcpy(&q_data, &iq_98608_1_bin[i*8+4], 4);
+        memcpy(&i_data_u, &iq_data[i*8], 4);
+        memcpy(&q_data_u, &iq_data[i*8+4], 4);
 
-        iptr[i] = i_data*fft_win[i];
-        qptr[i] = q_data*fft_win[i];
+        iptr[i] = uint_to_float(i_data_u)*fft_win[i];
+        qptr[i] = uint_to_float(q_data_u)*fft_win[i];
     }
 
     /* do fft */
@@ -92,7 +105,10 @@ void lvgl_update_waterfall(lv_obj_t* waterfall_image)
     }
 
     fftDataToInteger(PLOT_WIDTH, 255, 40, -10, iptr, waterfall_line);
+}
 
+void lvgl_update_waterfall(lv_obj_t* waterfall_image)
+{
     /* update image */
     uint8_t *databuf = waterfall.data;
 

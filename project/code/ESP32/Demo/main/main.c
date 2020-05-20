@@ -4,6 +4,7 @@
 #include <tca9555.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
 #include "lvgl.h"
 #include "lcd.h"
@@ -14,8 +15,15 @@
 #include "rfswitch.h"
 #include "cs5361.h"
 #include "lsdr.h"
+#include "iq_receive.h"
 
 extern lv_img_dsc_t waterfall;
+uint8_t iq_receive_buff[1024*4];
+
+xSemaphoreHandle iq_data_ready_sem = NULL;
+
+#define IQ_TIMING_IO  11
+#define FFT_TIMING_IO 12
 
 void IRAM_ATTR lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t* color_p)
 {
@@ -43,11 +51,12 @@ void lvgl_task(void *arg)
     lv_img_set_src(waterfall_image, &waterfall);
     lv_obj_align(waterfall_image, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -20);
 
-    uint32_t waterfallTimer = xTaskGetTickCount();
-
     while (1) {
-        if((xTaskGetTickCount() - waterfallTimer) > ( 100 / portTICK_PERIOD_MS)) {
-            waterfallTimer = xTaskGetTickCount();
+
+        if(xSemaphoreTake(iq_data_ready_sem, portMAX_DELAY) == pdTRUE) {
+            //gpio_set_level(FFT_TIMING_IO, 1);
+            waterfall_do_fft(iq_receive_buff);
+            //gpio_set_level(FFT_TIMING_IO, 0);
             lvgl_update_waterfall(waterfall_image);
         }
 
@@ -71,6 +80,18 @@ void lua_task(void* parameters)
     }
 }
 
+void iq_receive_task(void* parameters)
+{
+    iq_receive_spi_init();
+
+    while(1) {
+        //gpio_set_level(IQ_TIMING_IO, 1);
+        iq_receive_run(iq_receive_buff, 1024);
+        xSemaphoreGive(iq_data_ready_sem);
+        //gpio_set_level(IQ_TIMING_IO, 0);
+    }
+}
+
 void app_main()
 {
     lv_init();
@@ -82,8 +103,19 @@ void app_main()
     rf_switch_set_mode(RF_SWITCH_VHF1_MODE);
     cs5361_init();
 
-    xTaskCreate(lvgl_task, "lvgl_task", 1024 * 4, NULL, 5, NULL);
-    xTaskCreate(lua_task, "lua_task", 1024 * 10, NULL, 6, NULL);
+    /*gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = ((1ULL<<IQ_TIMING_IO) | (1ULL<<FFT_TIMING_IO));
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);*/
+
+    iq_data_ready_sem = xSemaphoreCreateBinary();
+
+    xTaskCreatePinnedToCore(lvgl_task, "lvgl_task", 1024 * 4, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(iq_receive_task, "iq_task", 1024 * 4, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(lua_task, "lua_task", 1024 * 10, NULL, 4, NULL, 0);
 
     vTaskSuspend(NULL);
 }

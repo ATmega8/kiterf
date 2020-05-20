@@ -2,15 +2,6 @@
 // Created by life on 19-11-20.
 //
 
-#include "msi001.h"
-#include <string.h>
-
-#include "driver/spi_master.h"
-#include "esp_log.h"
-#include "rfswitch.h"
-
-static const char* MSI001_TAG="MSI001";
-
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Mirics MSi001 silicon tuner driver
@@ -19,12 +10,22 @@ static const char* MSI001_TAG="MSI001";
  * Copyright (C) 2014 Antti Palosaari <crope@iki.fi>
  */
 
+#include "msi001.h"
+#include <string.h>
+
+#include "driver/spi_master.h"
+#include "esp_log.h"
+#include "rfswitch.h"
+#include "soft_spi.h"
+
+static const char* MSI001_TAG="MSI001";
+
 #define PIN_NUM_MISO -1
 #define PIN_NUM_MOSI 15
 #define PIN_NUM_CLK  16
 #define PIN_NUM_CS   17
 
-spi_device_handle_t  spi;
+static spi_device_handle_t  spi;
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -123,7 +124,14 @@ int msi001_wreg(uint32_t data)
     buf[1] = (uint8_t) ((data & 0x0000FF00) >> 8);
     buf[0] = (uint8_t) ((data & 0x00FF0000) >> 16);
     /* Register format: 4 bits addr + 20 bits value */
-    return spi_write(buf, 3);
+    soft_spi_set_cs(0);
+    ets_delay_us(1);
+    soft_spi_trans_byte(buf[0]);
+    soft_spi_trans_byte(buf[1]);
+    soft_spi_trans_byte(buf[2]);
+    ets_delay_us(1);
+    soft_spi_set_cs(1);
+    return 0;
 };
 
 int msi001_set_gain(uint32_t gain)
@@ -284,16 +292,17 @@ static int msi001_spi_init() {
     };
 
     //Initialize the SPI bus
-    ret=spi_bus_initialize(VSPI_HOST, &buscfg, 2);
+    ret=spi_bus_initialize(SPI_HOST, &buscfg, 0);
     ESP_ERROR_CHECK(ret);
     //Attach the LCD to the SPI bus
-    ret=spi_bus_add_device(VSPI_HOST, &devcfg, &spi);
+    ret=spi_bus_add_device(SPI_HOST, &devcfg, &spi);
     ESP_ERROR_CHECK(ret);
     return ret;
 }
 
 int msi001_standby() {
-    msi001_spi_init();
+    //msi001_spi_init();
+    soft_spi_init();
     msi001_wreg(0x0e);
     msi001_wreg(0x43420); /* low power IF mode */
     msi001_wreg(0x2800f5);
